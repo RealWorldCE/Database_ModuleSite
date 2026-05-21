@@ -3,102 +3,1273 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real World CE | Module Portal</title>
+  <title>Real World CE | Module Site + Manager Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            medicalBlue: '#1f2f46',
+            skyBrand: '#8ec5ea',
+            paleBrand: '#eaf5fc'
+          },
+          boxShadow: {
+            soft: '0 14px 34px rgba(15, 23, 42, 0.08)',
+            glow: '0 18px 40px rgba(59, 130, 246, 0.20)'
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    :root {
+      --rw-navy: #07111d;
+      --rw-ink: #0f2438;
+      --rw-blue: #2563eb;
+      --rw-blue-dark: #1d4ed8;
+      --rw-sky: #8ec5ea;
+      --rw-cyan: #67e8f9;
+      --rw-pale: #eaf5fc;
+      --rw-line: rgba(148,163,184,.32);
+      --rw-shadow: 0 28px 80px rgba(2, 8, 23, .16);
+      --rw-shadow-soft: 0 18px 50px rgba(15, 23, 42, .10);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { max-width: 100%; overflow-x: hidden; }
     body {
-      margin: 0;
+      font-family: Inter, sans-serif;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: Inter, Arial, sans-serif;
-      background: linear-gradient(135deg, #07111d, #10243a 55%, #1f5f93);
-      color: #fff;
+      color: #18283a;
+      background:
+        radial-gradient(900px 560px at 8% -8%, rgba(96,165,250,.32), transparent 62%),
+        radial-gradient(880px 520px at 102% 4%, rgba(14,165,233,.20), transparent 60%),
+        radial-gradient(760px 520px at 52% 105%, rgba(31,47,70,.13), transparent 62%),
+        linear-gradient(180deg, #f8fbff 0%, #eef5fb 46%, #f7fbff 100%);
     }
-    .loader {
-      width: min(92vw, 520px);
-      padding: 2rem;
-      border-radius: 1.5rem;
-      background: rgba(255,255,255,.12);
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(37,99,235,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,.045) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.72), transparent 78%);
+    }
+    .hidden-view { display:none !important; }
+    .glass {
+      background: linear-gradient(145deg, rgba(255,255,255,.90), rgba(255,255,255,.68));
+      border: 1px solid rgba(255,255,255,.75);
+      box-shadow: var(--rw-shadow-soft);
+      backdrop-filter: blur(20px) saturate(145%);
+      -webkit-backdrop-filter: blur(20px) saturate(145%);
+    }
+    .glass-soft {
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(148,163,184,.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 12px 26px rgba(15,23,42,.05);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+    }
+    .site-header {
+      background: rgba(255,255,255,.78) !important;
+      border-bottom: 1px solid rgba(148,163,184,.20) !important;
+      box-shadow: 0 16px 44px rgba(15,23,42,.07);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+    .site-header::after,
+    .admin-topbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,.55), rgba(142,197,234,.75), transparent);
+      pointer-events: none;
+    }
+    .brand-mark {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #0ea5e9 100%);
+      box-shadow: 0 18px 42px rgba(37,99,235,.25);
+    }
+    .hero-bg {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      color: white;
+      background:
+        radial-gradient(860px 460px at 80% 18%, rgba(142,197,234,.48), transparent 60%),
+        radial-gradient(720px 420px at 10% 10%, rgba(37,99,235,.30), transparent 58%),
+        linear-gradient(126deg, #07111d 0%, #11253b 42%, #1f5f93 100%) !important;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
+    }
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 72px 72px;
+      opacity: .34;
+      mask-image: radial-gradient(circle at 50% 24%, black 0%, transparent 75%);
+      pointer-events: none;
+    }
+    .hero-bg::after {
+      content: "";
+      position: absolute;
+      width: 54rem;
+      height: 54rem;
+      right: -22rem;
+      top: -24rem;
+      z-index: 0;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,.32), rgba(142,197,234,.16) 32%, transparent 66%);
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .hero-bg > * { position: relative; z-index: 1; }
+    .hero-bg h1 { text-shadow: 0 20px 60px rgba(0,0,0,.28); }
+    .btn-primary,
+    .premium-btn,
+    .marketing-launch {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #0ea5e9 100%) !important;
+      color: #fff !important;
       border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 28px 90px rgba(0,0,0,.35);
-      backdrop-filter: blur(18px);
-      text-align: center;
+      box-shadow: 0 16px 34px rgba(37,99,235,.24);
+      transition: transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease, color .22s ease;
     }
-    .loader h1 { margin: 0 0 .5rem; font-size: 1.45rem; }
-    .loader p { margin: 0; color: rgba(255,255,255,.78); line-height: 1.5; }
+    .btn-primary:hover,
+    .premium-btn:hover,
+    .marketing-launch:hover,
+    button:hover,
+    a:hover { transform: translateY(-1px); }
+    .btn-light {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(234,245,252,1) 100%) !important;
+      color: #10243a !important;
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: 0 18px 42px rgba(2,8,23,.12);
+    }
+    .chip {
+      min-height: 2.45rem;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(148,163,184,.28) !important;
+      transition: all .22s ease;
+    }
+    .chip.active,
+    .tab-active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #0ea5e9 100%) !important;
+      color: #fff !important;
+      border-color: rgba(37,99,235,.45) !important;
+      box-shadow: 0 16px 34px rgba(37,99,235,.24);
+    }
+    .module-card,
+    .track-card,
+    .stat-card,
+    .analytics-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(255,255,255,.70)) !important;
+      border: 1px solid rgba(255,255,255,.78) !important;
+      box-shadow: 0 18px 48px rgba(15,23,42,.08);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background-color .22s ease;
+    }
+    .module-card::before,
+    .track-card::before,
+    .stat-card::before,
+    .analytics-card::before,
+    .table-shell::before,
+    .settings-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 5px;
+      background: linear-gradient(90deg, #1d4ed8 0%, #8ec5ea 48%, #67e8f9 100%);
+      opacity: .92;
+    }
+    .module-card::after,
+    .stat-card::after,
+    .analytics-card::after {
+      content: "";
+      position: absolute;
+      width: 14rem;
+      height: 14rem;
+      top: -7.5rem;
+      right: -7.5rem;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(142,197,234,.28), transparent 66%);
+      pointer-events: none;
+    }
+    .module-card:hover,
+    .track-card:hover,
+    .analytics-card:hover {
+      transform: translateY(-5px) scale(1.005);
+      box-shadow: 0 26px 74px rgba(15,23,42,.16);
+      border-color: rgba(96,165,250,.55) !important;
+    }
+    .marketing-card { display:flex; flex-direction:column; min-height:100%; gap:.95rem; border-radius:1.75rem !important; }
+    .marketing-card__top { display:flex; align-items:flex-start; justify-content:space-between; gap:.85rem; position:relative; z-index:2; }
+    .marketing-card__specialty { display:inline-flex; align-items:center; gap:.45rem; min-width:0; color:#1e3a8a; font-size:.75rem; font-weight:950; letter-spacing:.11em; text-transform:uppercase; line-height:1.1; }
+    .marketing-card__specialty .material-symbols-outlined { display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border-radius:.95rem; background:rgba(239,246,255,.92); border:1px solid rgba(147,197,253,.45); color:#2563eb; font-size:18px; box-shadow:0 10px 20px rgba(37,99,235,.08); flex:0 0 auto; }
+    .marketing-card__badges { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:.4rem; flex:0 0 auto; }
+    .marketing-status-pill,
+    .marketing-format-pill,
+    .status-pill { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:.42rem .65rem; font-size:.68rem; font-weight:950; line-height:1; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+    .marketing-status-pill { color:#075985; background:rgba(224,242,254,.92); border:1px solid rgba(125,211,252,.58); }
+    .marketing-format-pill { color:#047857; background:rgba(236,253,245,.92); border:1px solid rgba(110,231,183,.55); }
+    .status-complete { color:#047857; background:rgba(236,253,245,.94); border:1px solid rgba(110,231,183,.58); }
+    .status-progress { color:#a16207; background:rgba(254,249,195,.92); border:1px solid rgba(253,224,71,.58); }
+    .status-started { color:#075985; background:rgba(224,242,254,.92); border:1px solid rgba(125,211,252,.58); }
+    .module-preview {
+      position:relative;
+      margin-top:0;
+      overflow:hidden;
+      border-radius:1.35rem;
+      border:1px solid rgba(255,255,255,.72);
+      aspect-ratio:16 / 9.5;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 18px 36px rgba(15,23,42,.10);
+      background:
+        radial-gradient(420px 220px at 82% 12%, rgba(142,197,234,.34), transparent 62%),
+        linear-gradient(145deg, #0f2438, #173d60 58%, #8ec5ea);
+      isolation:isolate;
+    }
+    .module-preview::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(120deg, rgba(255,255,255,.16), transparent 36%), radial-gradient(circle at 80% 18%, rgba(255,255,255,.24), transparent 28%); pointer-events:none; }
+    .module-preview::after { content:""; position:absolute; inset:auto 0 0 0; height:52%; background:linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(15,23,42,.22) 44%, rgba(15,23,42,.56) 100%); pointer-events:none; }
+    .active-preview { display:flex; align-items:center; justify-content:center; min-height:185px; }
+    .preview-window { position:absolute; inset:1rem; z-index:1; border-radius:1rem; overflow:hidden; background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.76); box-shadow:0 22px 44px rgba(2,8,23,.18); transform:translateY(-.2rem); }
+    .preview-window__bar { height:2rem; display:flex; align-items:center; gap:.38rem; padding:0 .8rem; background:linear-gradient(135deg, rgba(248,250,252,.95), rgba(226,232,240,.85)); border-bottom:1px solid rgba(148,163,184,.22); }
+    .preview-window__bar span { width:.48rem; height:.48rem; border-radius:999px; background:#93c5fd; opacity:.9; }
+    .preview-window__bar span:nth-child(2){ background:#8ec5ea; }
+    .preview-window__bar span:nth-child(3){ background:#67e8f9; }
+    .preview-window__body { height:calc(100% - 2rem); padding:1rem; background:radial-gradient(300px 160px at 88% 8%, rgba(142,197,234,.34), transparent 60%), linear-gradient(145deg, #f8fbff 0%, #eaf5fc 100%); }
+    .preview-window__eyebrow { display:inline-flex; border-radius:999px; background:rgba(37,99,235,.10); color:#1d4ed8; padding:.25rem .55rem; font-size:.58rem; font-weight:950; letter-spacing:.12em; text-transform:uppercase; }
+    .preview-window__title { margin-top:.65rem; color:#0f2438; font-size:1.05rem; line-height:1.05; font-weight:950; letter-spacing:-.04em; max-width:75%; }
+    .preview-window__line { height:.42rem; margin-top:.55rem; border-radius:999px; background:rgba(148,163,184,.35); }
+    .preview-window__tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:.45rem; margin-top:.85rem; }
+    .preview-window__tiles span { height:2.1rem; border-radius:.72rem; background:rgba(255,255,255,.75); border:1px solid rgba(147,197,253,.32); box-shadow:inset 0 1px 0 rgba(255,255,255,.85); }
+    .active-preview .preview-caption { z-index:3; }
+
+    .live-preview { background:#ffffff; }
+    .module-live-frame {
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:0;
+      width:180%;
+      height:180%;
+      border:0;
+      background:#ffffff;
+      transform:scale(.56);
+      transform-origin:top left;
+      pointer-events:none;
+    }
+    .live-preview::before {
+      z-index:2;
+      background:linear-gradient(120deg, rgba(255,255,255,.10), transparent 36%), radial-gradient(circle at 80% 18%, rgba(255,255,255,.18), transparent 28%);
+    }
+    .live-preview::after { z-index:2; height:44%; background:linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(15,23,42,.18) 44%, rgba(15,23,42,.54) 100%); }
+    .live-preview-badge {
+      position:absolute;
+      top:.7rem;
+      left:.7rem;
+      z-index:4;
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+      border-radius:999px;
+      padding:.38rem .65rem;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(147,197,253,.48);
+      color:#1d4ed8;
+      box-shadow:0 12px 24px rgba(15,23,42,.16);
+      font-size:.65rem;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      line-height:1;
+    }
+    .live-preview-badge .material-symbols-outlined { font-size:14px; }
+    .live-preview .preview-caption { z-index:4; }
+    .live-preview-fallback {
+      position:absolute;
+      inset:0;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1rem;
+      color:#1f2f46;
+      background:radial-gradient(420px 220px at 82% 12%, rgba(142,197,234,.34), transparent 62%), linear-gradient(145deg, #f8fbff 0%, #eaf5fc 100%);
+      text-align:center;
+      font-weight:900;
+      opacity:0;
+      transition:opacity .2s ease;
+      pointer-events:none;
+    }
+    .live-preview.frame-error .live-preview-fallback { opacity:1; }
+
+
+    .preview-caption { position:absolute; left:1rem; right:1rem; bottom:.9rem; z-index:2; color:#fff; text-shadow:0 8px 24px rgba(0,0,0,.34); }
+    .preview-caption .preview-title { display:block; font-size:.95rem; font-weight:900; letter-spacing:-.02em; line-height:1.1; }
+    .preview-caption .preview-subtitle { display:block; margin-top:.2rem; font-size:.72rem; font-weight:700; color:rgba(255,255,255,.88); text-transform:uppercase; letter-spacing:.08em; }
+    .marketing-card__body { display:flex; flex:1; flex-direction:column; min-width:0; padding:.1rem .15rem .1rem; position:relative; z-index:2; }
+    .marketing-card__eyebrow { margin-bottom:.45rem; color:#2563eb; font-size:.68rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
+    .marketing-card__title { font-size:clamp(1.16rem,2vw,1.42rem); font-weight:950; line-height:1.05; letter-spacing:-.045em; margin:0; color:#1f2f46; }
+    .marketing-card__description { margin-top:.72rem; color:#475569; font-size:.92rem; line-height:1.55; min-height:4.25rem; }
+    .marketing-card__metadata { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; margin-top:1rem; padding:.65rem; border-radius:1.2rem; background:rgba(248,250,252,.86); border:1px solid rgba(226,232,240,.88); box-shadow:inset 0 1px 0 rgba(255,255,255,.74); }
+    .marketing-card__meta-label { display:block; margin-bottom:.28rem; color:#64748b; font-size:.62rem; font-weight:950; letter-spacing:.12em; text-transform:uppercase; line-height:1; }
+    .marketing-card__meta-item strong { display:block; overflow:hidden; color:#0f2438; font-size:.8rem; font-weight:900; line-height:1.2; text-overflow:ellipsis; white-space:nowrap; }
+    .marketing-card__footer { display:flex; align-items:center; justify-content:space-between; gap:.85rem; margin-top:auto; padding-top:1rem; }
+    .marketing-launch { display:inline-flex; align-items:center; justify-content:center; gap:.45rem; min-height:2.85rem; padding:.78rem 1rem; border-radius:1rem; font-size:.92rem; font-weight:950; text-decoration:none; white-space:nowrap; }
+    .marketing-card__owner { color:#64748b; font-size:.72rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; text-align:right; white-space:nowrap; }
+    .table-shell,
+    .settings-shell { position:relative; overflow:hidden; border-radius:2rem; }
+    .rw-table { width:100%; border-collapse:separate; border-spacing:0; }
+    .rw-table th { padding:.95rem 1rem; text-align:left; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.10em; border-bottom:1px solid rgba(148,163,184,.22); background:rgba(248,250,252,.78); }
+    .rw-table td { padding:1rem; color:#334155; border-bottom:1px solid rgba(148,163,184,.18); font-size:.88rem; vertical-align:top; }
+    .rw-table tr:hover td { background:rgba(239,246,255,.48); }
+    .avatar { background:rgba(239,246,255,.92); border:1px solid rgba(147,197,253,.45); color:#2563eb; box-shadow:0 10px 20px rgba(37,99,235,.08); }
+    .meter { height:.55rem; border-radius:999px; background:rgba(226,232,240,.9); overflow:hidden; }
+    .meter span { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#2563eb,#0ea5e9,#67e8f9); }
+    input, select { outline:none; color:#0f2438; }
+    input::placeholder { color:#94a3b8; }
+    #loginModal { background:rgba(7,17,29,.72); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    .login-card {
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 32px 110px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    .login-card::before { content:""; position:absolute; inset:-1px; z-index:-1; border-radius:2rem; background:linear-gradient(135deg, rgba(142,197,234,.55), transparent 28%, rgba(37,99,235,.44), transparent 74%); opacity:.88; filter:blur(.2px); }
+    #adminPortal {
+      background:
+        radial-gradient(900px 560px at 8% -8%, rgba(96,165,250,.30), transparent 62%),
+        radial-gradient(760px 520px at 92% 5%, rgba(14,165,233,.18), transparent 60%),
+        linear-gradient(180deg, #f8fbff 0%, #eef5fb 52%, #f7fbff 100%);
+    }
+    .admin-sidebar { background:rgba(255,255,255,.76); border-right:1px solid rgba(148,163,184,.22); box-shadow:16px 0 44px rgba(15,23,42,.06); backdrop-filter:blur(18px) saturate(150%); -webkit-backdrop-filter:blur(18px) saturate(150%); }
+    .admin-topbar { position:relative; background:rgba(255,255,255,.74); border-bottom:1px solid rgba(148,163,184,.20); box-shadow:0 16px 44px rgba(15,23,42,.06); backdrop-filter:blur(18px) saturate(150%); -webkit-backdrop-filter:blur(18px) saturate(150%); }
+    .admin-tab { color:#475569; transition:all .22s ease; }
+    .admin-tab:not(.tab-active):hover { background:rgba(239,246,255,.86); color:#1e3a8a; transform:translateY(-1px); }
+    @media (max-width: 900px) {
+      .admin-shell { grid-template-columns: 1fr !important; }
+      .admin-sidebar { position:relative !important; height:auto !important; }
+      .admin-sidebar .bottom-actions { position:relative !important; left:auto !important; right:auto !important; bottom:auto !important; margin-top:1rem; }
+      .marketing-card__metadata { grid-template-columns:1fr; }
+      .marketing-card__meta-item strong { white-space:normal; }
+      .marketing-card__description { min-height:0; }
+      .marketing-card__footer { flex-direction:column; align-items:stretch; }
+      .marketing-card__owner { text-align:center; }
+    }
+    @media (max-width: 640px) {
+      .hero-bg { border-radius:0 0 2rem 2rem; }
+      .module-card:hover, .track-card:hover, .analytics-card:hover { transform:none; }
+      .marketing-card__top { flex-direction:column; }
+      .marketing-card__badges { justify-content:flex-start; }
+      .module-preview { aspect-ratio:16 / 10.5; }
+    }
+
+    /* Restored full portal login and embedded module viewer */
+    #portalLogin {
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+      background:
+        radial-gradient(680px 420px at 16% 10%, rgba(96,165,250,.28), transparent 60%),
+        radial-gradient(720px 520px at 82% 18%, rgba(103,232,249,.18), transparent 62%),
+        linear-gradient(135deg, #050b14 0%, #07111d 46%, #10243a 100%);
+    }
+    #portalLogin::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: .34;
+      mask-image: radial-gradient(circle at 50% 28%, black 0%, transparent 78%);
+    }
+    #portalLogin .login-card { max-width: 31rem; }
+    #portalLogin input {
+      background: rgba(255,255,255,.95) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 14px 34px rgba(0,0,0,.10);
+    }
+    .main-menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      border-radius: 1rem;
+      min-height: 2.75rem;
+      padding: .72rem 1rem;
+      font-size: .88rem;
+      font-weight: 900;
+      border: 1px solid rgba(148,163,184,.25);
+      background: rgba(255,255,255,.82);
+      color: #334155;
+      box-shadow: 0 12px 26px rgba(15,23,42,.06);
+    }
+    #moduleViewer {
+      background:
+        radial-gradient(760px 420px at 10% 0%, rgba(142,197,234,.22), transparent 62%),
+        linear-gradient(180deg, #f8fbff, #eef5fb);
+    }
+    #moduleViewer .viewer-topbar {
+      background: rgba(255,255,255,.86);
+      border-bottom: 1px solid rgba(148,163,184,.24);
+      box-shadow: 0 18px 48px rgba(15,23,42,.08);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+    .module-viewer-frame {
+      width: 100%;
+      height: calc(100dvh - 92px);
+      border: 0;
+      background: #ffffff;
+      border-left: 1px solid rgba(148,163,184,.20);
+      border-right: 1px solid rgba(148,163,184,.20);
+      border-bottom: 1px solid rgba(148,163,184,.20);
+      box-shadow: 0 30px 70px rgba(15,23,42,.14);
+    }
+    @media (max-width: 640px) {
+      .module-viewer-frame { height: calc(100dvh - 142px); }
+    }
+
   </style>
 </head>
 <body>
+  <section id="portalLogin" class="flex items-center justify-center px-4 py-10">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
+      <div class="absolute top-24 right-0 h-80 w-80 rounded-full bg-skyBrand/20 blur-3xl"></div>
+      <div class="absolute bottom-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-white/10 blur-3xl"></div>
+    </div>
+    <div class="login-card relative w-full rounded-[2rem] p-5 sm:p-7 text-center">
+      <div class="mx-auto mb-4 h-3 w-16 rounded-full bg-gradient-to-r from-skyBrand via-white to-skyBrand opacity-90"></div>
+      <div class="text-white text-3xl sm:text-5xl font-black tracking-tight uppercase">Real World <span class="text-skyBrand">CE</span></div>
+      <div class="mt-2 text-blue-100/75 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em]">Module Portal</div>
+      <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80">
+        <span class="material-symbols-outlined text-[16px]">verified_user</span> Demo Access
+      </div>
+      <form autocomplete="off" class="mt-7 space-y-4 text-left" id="portalLoginForm" onsubmit="event.preventDefault(); portalLogin();">
+        <label class="block">
+          <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Username</span>
+          <input autocomplete="username" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalUsername" placeholder="Demo" type="text" value="Demo"/>
+        </label>
+        <label class="block">
+          <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Password</span>
+          <input autocomplete="current-password" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalPassword" placeholder="Demo" type="password" value="Demo"/>
+        </label>
+        <div class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700" id="portalLoginError">Please enter Demo for both username and password, or use the manager credentials.</div>
+        <button class="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-black" type="submit">
+          <span class="material-symbols-outlined text-[20px]">login</span> Enter Module Portal
+        </button>
+        <button class="w-full rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-blue-100 hover:bg-white/15" onclick="portalQuickLogin()" type="button">Quick Demo Access</button>
+      </form>
+      <div class="mt-5 text-center text-[11px] font-semibold text-blue-100/60">Demo login: Demo / Demo · Manager login: manager@realworldce.org / manager123</div>
+    </div>
+  </section>
 
-  <div class="loader" id="portal-loader">
-    <h1>Loading Real World CE Portal</h1>
-    <p>Securely fetching the latest clinical modules...</p>
+  <div id="publicSite" class="hidden-view min-h-screen">
+    <header class="site-header sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="brand-mark w-11 h-11 rounded-2xl flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-white">public</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-black tracking-tight text-lg sm:text-xl text-medicalBlue uppercase leading-none">Real World <span class="text-blue-600">CE</span></div>
+            <div class="text-[11px] sm:text-sm text-slate-500 font-medium mt-1">Clinical learning portal with manager reporting</div>
+          </div>
+        </div>
+        <nav class="hidden lg:flex items-center gap-3 text-sm">
+          <button onclick="showPublicSection('modules')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Library</button>
+          <button onclick="showPublicSection('about')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Platform</button>
+          <button onclick="openManagerLogin()" class="btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Login</button>
+          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Login Screen</button>
+        </nav>
+        <div class="lg:hidden flex gap-2">
+          <button onclick="openManagerLogin()" class="btn-primary px-4 py-2 rounded-full font-black text-sm inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Manager</button>
+          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 bg-white/80 text-slate-600 font-bold text-sm">Login</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-bg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="grid lg:grid-cols-[1.28fr_.72fr] gap-8 items-center">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-5">
+              <span class="px-3 py-1 rounded-full bg-white/12 border border-white/15 text-[11px] font-black uppercase tracking-[0.18em]">Launch Library</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/90 text-[11px] font-black uppercase tracking-[0.18em]">Manager Reporting</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.02] max-w-4xl">Bringing the <span class="text-skyBrand">Real World</span> Into Clinical Education.</h1>
+            <p class="mt-5 text-blue-100/85 text-lg leading-8 max-w-2xl">A clinical education platform built to connect real patient decisions, real practice challenges, and real-world learning.</p>
+            <div class="mt-8 flex flex-col sm:flex-row gap-3">
+              <button onclick="document.getElementById('moduleGrid').scrollIntoView({behavior:'smooth'})" class="btn-light inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl font-bold"><span class="material-symbols-outlined text-[20px]">apps</span> Browse Modules</button>
+              <button onclick="openManagerLogin()" class="inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl border border-white/20 bg-white/10 font-bold hover:bg-white/15 transition"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Manager Portal</button>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-6 shadow-soft text-slate-900">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <div class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Live Overview</div>
+                <div class="text-2xl font-black tracking-tight text-medicalBlue mt-1">Learning activity</div>
+              </div>
+              <span class="material-symbols-outlined text-blue-500 text-[30px]">monitoring</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Completions</div><div id="heroCompletions" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Credits</div><div id="heroCredits" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Learners</div><div id="heroLearners" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Modules</div><div id="heroModules" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+      <section id="modules" class="space-y-6 mb-12">
+        <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Module Library</div>
+              <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Module command center</h2>
+              <p class="text-slate-500 mt-1">Search, launch, and track every live clinical module from one polished command center.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="chip active inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold" data-topic-chip="All" onclick="setTopicFilter('All')">All</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Oncology" onclick="setTopicFilter('Oncology')">Oncology</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Neurology" onclick="setTopicFilter('Neurology')">Neurology</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Primary Care" onclick="setTopicFilter('Primary Care')">Primary Care</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Dermatology" onclick="setTopicFilter('Dermatology')">Dermatology</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Urology" onclick="setTopicFilter('Urology')">Urology</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Immunology / ID" onclick="setTopicFilter('Immunology / ID')">Immunology / ID</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Psychiatry" onclick="setTopicFilter('Psychiatry')">Psychiatry</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Gastroenterology" onclick="setTopicFilter('Gastroenterology')">Gastroenterology</button>
+              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Assessment" onclick="setTopicFilter('Assessment')">Assessment</button>
+            </div>
+          </div>
+          <div class="mt-5 grid md:grid-cols-[1fr_auto] gap-3">
+            <label class="relative block">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+              <input id="moduleSearch" oninput="renderModules()" class="glass-soft w-full h-12 rounded-2xl pl-12 pr-4 text-sm font-medium focus:border-blue-400 focus:ring-4 focus:ring-blue-50" placeholder="Search by module, specialty, topic, or format..." type="text" />
+            </label>
+            <select id="topicFilter" onchange="syncTopicChips(); renderModules()" class="glass-soft h-12 w-full md:w-auto rounded-2xl px-4 md:px-5 text-sm font-bold"></select>
+          </div>
+        </div>
+        <div id="moduleGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+      </section>
+
+      <section id="about" class="glass rounded-[2rem] p-8 mb-12 track-card">
+        <div class="relative z-10">
+          <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Platform Build</div>
+          <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1 mb-3">How this connects to your module site</h2>
+          <p class="text-slate-600 leading-7 max-w-4xl">Each module launch creates a local learner activity record. In a real LMS build, this same activity would be sent to your backend database or third-party LMS credit tracker. The manager portal is hidden until a manager logs in.</p>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <script>
-    (async function loadUpdatedPortal() {
-      const sourceUrl = 'https://raw.githubusercontent.com/RealWorldCE/Module_Site/0e7f01ff08ffa6cf6cb1625820ed586743f7783a/index.html';
+  <div id="loginModal" class="hidden-view fixed inset-0 z-50 flex items-center justify-center p-5">
+    <div class="login-card relative rounded-[2rem] max-w-md w-full p-7">
+      <button onclick="closeManagerLogin()" class="absolute right-5 top-5 text-blue-100/70 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-4 h-3 w-16 rounded-full bg-gradient-to-r from-skyBrand via-white to-skyBrand opacity-90"></div>
+        <div class="text-white text-3xl sm:text-4xl font-black tracking-tight uppercase">Real World <span class="text-skyBrand">CE</span></div>
+        <div class="mt-2 text-blue-100/75 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em]">Manager Portal</div>
+        <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80"><span class="material-symbols-outlined text-[16px]">verified_user</span> Protected Demo Access</div>
+      </div>
+      <label class="block mb-4">
+        <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Email</span>
+        <input id="managerEmail" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" value="manager@realworldce.org" />
+      </label>
+      <label class="block mb-4">
+        <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Password</span>
+        <input id="managerPassword" type="password" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" value="manager123" />
+      </label>
+      <div id="loginError" class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 mb-4">Invalid manager login.</div>
+      <button onclick="managerLogin()" class="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-black"><span class="material-symbols-outlined text-[20px]">login</span>Enter Manager Portal</button>
+      <button onclick="closeManagerLogin(); backToMainMenu();" class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-5 font-black text-blue-100 hover:bg-white/15"><span class="material-symbols-outlined text-[18px]">home</span>Back to Main Menu</button>
+      <div class="text-[11px] text-blue-100/60 mt-4 text-center">Demo credentials: manager@realworldce.org / manager123</div>
+    </div>
+  </div>
 
-      // --- INJECT A LINK TO THE NEW ADMIN PORTAL ---
-      // This creates a sleek floating button in the bottom-left corner
-      const adminButtonUI = `
-      <style>
-        #rwce-admin-link {
-          position: fixed; bottom: 24px; left: 24px; z-index: 99998;
-          background: #002147; color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.3);
-          padding: 12px 24px; border-radius: 99px; font-weight: 700; cursor: pointer;
-          box-shadow: 0 10px 25px rgba(0,33,71,0.6); font-family: 'Inter', sans-serif;
-          display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
-          text-decoration: none;
-        }
-        #rwce-admin-link:hover { 
-          transform: translateY(-3px); 
-          box-shadow: 0 15px 30px rgba(0, 229, 255, 0.2); 
-          background: #003366; 
-          color: white;
-        }
-      </style>
-
-      <a href="admin.html" id="rwce-admin-link" target="_blank">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-        Admin Dashboard
-      </a>
-      `;
-
-      try {
-        let html = await fetch(sourceUrl, { cache: 'no-store' }).then(function(response) {
-          if (!response.ok) {
-            throw new Error('Unable to load source HTML. Status: ' + response.status);
-          }
-          return response.text();
-        });
-
-        // Retain your previous formatting logic
-        html = html.replace(
-          /<article([^>]*data-title="real quiz realworldce\/real-quiz"[\s\S]*?)<\/article>/i,
-          function(fullCard) {
-            return fullCard
-              .replace(/(<div class="marketing-card__specialty"><span[^>]*>quiz<\/span><span>)Assessment(<\/span><\/div>)/i, '$1MODULE$2')
-              .replace(/(<span class="marketing-format-pill">)Assessment(<\/span>)/gi, '$1MODULE$2')
-              .replace(/(<span class="preview-subtitle">)Assessment • Assessment(<\/span>)/gi, '$1MODULE • Assessment$2');
-          }
-        );
-
-        // Inject the admin button right before the closing </body> tag
-        html = html.replace('</body>', adminButtonUI + '</body>');
-
-        document.open();
-        document.write(html);
-        document.close();
-      } catch (error) {
-        document.body.innerHTML = `
-          <div class="loader">
-            <h1>Module Portal could not load</h1>
-            <p>${error.message}</p>
+  <div id="adminPortal" class="hidden-view min-h-screen">
+    <div class="admin-shell grid grid-cols-[280px_1fr] min-h-screen">
+      <aside class="admin-sidebar sticky top-0 h-screen p-4">
+        <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-slate-200/70">
+          <div class="brand-mark w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white">dataset</span></div>
+          <div><div class="font-black text-medicalBlue text-sm uppercase">Real World <span class="text-blue-600">CE</span></div><div class="text-[10px] uppercase tracking-widest text-slate-500">Manager Portal</div></div>
+        </div>
+        <nav class="space-y-2">
+          <button data-tab="dashboard" onclick="showAdminTab('dashboard')" class="admin-tab tab-active w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">dashboard</span>Dashboard</button>
+          <button data-tab="learners" onclick="showAdminTab('learners')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">group</span>User Reports</button>
+          <button data-tab="analytics" onclick="showAdminTab('analytics')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">monitoring</span>Module Analytics</button>
+          <button data-tab="settings" onclick="showAdminTab('settings')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">settings</span>Settings</button>
+        </nav>
+        <div class="bottom-actions absolute bottom-4 left-4 right-4">
+          <div class="glass-soft rounded-3xl p-4 mb-3">
+            <div class="text-xs font-black uppercase tracking-widest text-slate-500">Access Level</div>
+            <div class="font-black text-medicalBlue mt-1">Manager Demo</div>
           </div>
-        `;
+          <button onclick="backToMainMenu()" class="w-full px-4 py-3 rounded-2xl bg-white/80 hover:bg-white text-slate-700 border border-slate-200 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">home</span>Back to Main Menu</button>
+          <button onclick="logoutManager()" class="mt-2 w-full px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">logout</span>Manager Logout</button>
+        </div>
+      </aside>
+
+      <main class="min-w-0">
+        <header class="admin-topbar sticky top-0 z-30 px-5 md:px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div><h1 id="adminTitle" class="text-3xl font-black tracking-tight text-medicalBlue">System Overview</h1><p class="text-slate-500 mt-1">Manager-only tracking for learner credits, time spent, and module completion.</p></div>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="backToMainMenu()" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">home</span>Back to Main Menu</button>
+            <button onclick="seedDemoData(); renderAll();" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 font-bold text-sm text-slate-700">Load Demo Data</button>
+            <button onclick="exportCSV()" class="btn-primary px-4 py-3 rounded-2xl font-bold text-sm flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">download</span>Export CSV</button>
+          </div>
+        </header>
+
+        <div class="p-5 md:p-8">
+          <section id="admin-dashboard" class="admin-view">
+            <div class="grid md:grid-cols-4 gap-5 mb-7">
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Total Completions</div><div id="statCompletions" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Credits Issued</div><div id="statCredits" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Active Learners</div><div id="statLearners" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
+              <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Avg. Time</div><div id="statAvgTime" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0m</div></div>
+            </div>
+            <div class="table-shell glass overflow-hidden"><div class="p-5 border-b border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10"><h2 class="font-black text-medicalBlue">Recent Module Activity</h2><input id="recentSearch" oninput="renderRecentTable()" class="glass-soft rounded-xl px-4 py-2 text-sm" placeholder="Search activity..." /></div><div class="overflow-x-auto relative z-10"><table class="rw-table"><thead><tr><th>Learner</th><th>Module</th><th>Progress</th><th>Time</th><th>Credit</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-learners" class="admin-view hidden-view">
+            <div class="table-shell glass overflow-hidden"><div class="p-5 border-b border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10"><h2 class="font-black text-medicalBlue">User Credit and Time Report</h2><input id="learnerSearch" oninput="renderLearnerTable()" class="glass-soft rounded-xl px-4 py-2 text-sm" placeholder="Search name, email, org..." /></div><div class="overflow-x-auto relative z-10"><table class="rw-table"><thead><tr><th>Learner</th><th>Organization</th><th>Modules</th><th>Total Time</th><th>Credits Earned</th><th>Last Activity</th></tr></thead><tbody id="learnerTable"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-analytics" class="admin-view hidden-view">
+            <div id="analyticsGrid" class="grid lg:grid-cols-2 gap-5"></div>
+          </section>
+
+          <section id="admin-settings" class="admin-view hidden-view">
+            <div class="settings-shell glass rounded-[2rem] p-6 max-w-3xl">
+              <div class="relative z-10">
+                <h2 class="text-xl font-black text-medicalBlue mb-3">Manager Settings</h2>
+                <p class="text-slate-600 leading-7 mb-6">This front-end demo stores activity in the browser with localStorage. For a real client LMS, connect these actions to your secure backend, LMS API, or database.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Current demo manager</div><div class="text-slate-500 text-sm">manager@realworldce.org</div></div>
+                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Storage mode</div><div id="storageMode" class="text-slate-500 text-sm">Browser localStorage demo</div></div>
+                </div>
+                <div class="glass-soft rounded-3xl p-5 mt-4"><div class="font-black text-medicalBlue mb-2">Supabase connection</div><div class="text-slate-500 text-sm leading-6">Paste your Supabase project URL and public anon key into the CONFIG block near the bottom of this HTML file. Run the included SQL setup file first, then create users in Supabase Auth.</div></div><div class="flex flex-wrap gap-3 mt-6"><button onclick="clearActivity()" class="px-4 py-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-bold">Clear Activity Data</button><button onclick="seedDemoData(); renderAll();" class="btn-primary px-4 py-3 rounded-2xl font-bold">Reset Demo Data</button><button onclick="refreshSupabaseActivity()" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 font-bold">Refresh Supabase Data</button></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <section id="moduleViewer" class="hidden-view min-h-screen">
+    <div class="viewer-topbar sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <button onclick="closeModuleViewer()" id="moduleBackBtn" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">arrow_back</span>Back to Main Menu</button>
+        <div class="min-w-0 text-center sm:text-left">
+          <div class="text-[10px] uppercase tracking-[0.18em] font-black text-blue-700">Module Viewer</div>
+          <div class="truncate text-sm sm:text-base font-black text-medicalBlue" id="moduleViewerTitle">Real World CE Module</div>
+        </div>
+        <a id="moduleNewTabLink" class="btn-primary inline-flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black" href="#" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined text-[18px]">open_in_new</span>Open in New Tab</a>
+      </div>
+    </div>
+    <iframe class="module-viewer-frame" id="moduleFrame" loading="eager" referrerpolicy="no-referrer-when-downgrade" title="Real World CE module viewer"></iframe>
+    <div class="fixed bottom-3 left-1/2 z-50 w-[calc(100%-1.5rem)] max-w-xl -translate-x-1/2 rounded-2xl border border-slate-200 bg-white/92 px-3 sm:px-4 py-2.5 sm:py-3 text-center text-[11px] sm:text-xs font-semibold text-slate-600 shadow-soft backdrop-blur-xl">
+      If a module does not load inside the viewer, use <span class="font-black text-blue-700">Open in New Tab</span>.
+    </div>
+  </section>
+
+<script>
+const modules = [
+  {
+    "id": "prostate-parpi",
+    "title": "Prostate PARPi",
+    "short": "Prostate PARPi",
+    "topic": "Oncology",
+    "icon": "genetics",
+    "credits": 1.5,
+    "repo": "RealWorldCE/ProstatePARPi",
+    "url": "https://realworldce.github.io/ProstatePARPi/",
+    "description": "Metastatic prostate cancer workflow focused on HRR testing, PARPi sequencing, shared decisions, and MDT adverse-event management."
+  },
+  {
+    "id": "cidp-module",
+    "title": "CIDP Module",
+    "short": "CIDP Module",
+    "topic": "Neurology",
+    "icon": "neurology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/CIDP-Module",
+    "url": "https://realworldce.github.io/CIDP-Module/",
+    "description": "CIDP clinical learning experience focused on diagnostic confidence, treatment selection, objective monitoring, and case application."
+  },
+  {
+    "id": "narcolepsy-type1",
+    "title": "Narcolepsy Type 1",
+    "short": "Narcolepsy Type 1",
+    "topic": "Neurology",
+    "icon": "neurology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Narcolepsy-Type1",
+    "url": "https://realworldce.github.io/Narcolepsy-Type1/",
+    "description": "Narcolepsy type 1 learning experience focused on recognition, diagnosis, symptom burden, and patient-centered treatment planning."
+  },
+  {
+    "id": "oabmodule",
+    "title": "OAB Module",
+    "short": "OAB Module",
+    "topic": "Urology",
+    "icon": "medical_services",
+    "credits": 1.0,
+    "repo": "RealWorldCE/OABModule",
+    "url": "https://realworldce.github.io/OABModule/",
+    "description": "Overactive bladder education focused on diagnosis, treatment selection, anticholinergic risk, and practical patient counseling."
+  },
+  {
+    "id": "takeda-pid",
+    "title": "Takeda PID",
+    "short": "Takeda PID",
+    "topic": "Immunology / ID",
+    "icon": "immunology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Takeda_PID",
+    "url": "https://realworldce.github.io/Takeda_PID/",
+    "description": "Primary immunodeficiency education focused on diagnostic delay, targeted treatment evolution, care coordination, and patient transition planning."
+  },
+  {
+    "id": "real-quiz",
+    "title": "Real Quiz",
+    "short": "Real Quiz",
+    "topic": "Assessment",
+    "icon": "quiz",
+    "credits": 0.5,
+    "repo": "RealWorldCE/Real-Quiz",
+    "url": "https://realworldce.github.io/Real-Quiz/",
+    "description": "Assessment-style learning experience for knowledge checks, competency tracking, and learner engagement."
+  },
+  {
+    "id": "psoriatic-disease",
+    "title": "Psoriatic Disease",
+    "short": "Psoriatic Disease",
+    "topic": "Dermatology",
+    "icon": "dermatology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Psoriatic_Disease",
+    "url": "https://realworldce.github.io/Psoriatic_Disease/",
+    "description": "Dermatology module connecting skin and joint burden with treatment goals, shared decision-making, and real-world patient impact."
+  },
+  {
+    "id": "myelofibrosis",
+    "title": "Myelofibrosis Module",
+    "short": "Myelofibrosis",
+    "topic": "Oncology",
+    "icon": "genetics",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Myelofibrosis_Module",
+    "url": "https://realworldce.github.io/Myelofibrosis_Module/",
+    "description": "Oncology education focused on symptom burden, risk stratification, therapy selection, and practical management in myelofibrosis care."
+  },
+  {
+    "id": "narcolepsy",
+    "title": "Narcolepsy Module",
+    "short": "Narcolepsy Module",
+    "topic": "Neurology",
+    "icon": "neurology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Narcolepsy",
+    "url": "https://realworldce.github.io/Narcolepsy/",
+    "description": "Interactive sleep-medicine module designed to strengthen recognition, diagnostic workup, and treatment decision-making for narcolepsy."
+  },
+  {
+    "id": "takeda-ibd",
+    "title": "Takeda IBD Module",
+    "short": "IBD Module",
+    "topic": "Gastroenterology",
+    "icon": "gastroenterology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Takeda_IBDModule",
+    "url": "https://realworldce.github.io/Takeda_IBDModule/",
+    "description": "Inflammatory bowel disease learning experience focused on real-world treatment decisions, patient communication, and practical care planning."
+  },
+  {
+    "id": "cidp",
+    "title": "CIDP",
+    "short": "CIDP",
+    "topic": "Neurology",
+    "icon": "neurology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/CIDP",
+    "url": "https://realworldce.github.io/CIDP/",
+    "description": "CIDP recognition, diagnostic confidence, treatment selection, and longitudinal monitoring decisions."
+  },
+  {
+    "id": "cmv",
+    "title": "CMV Module",
+    "short": "CMV Module",
+    "topic": "Immunology / ID",
+    "icon": "biotech",
+    "credits": 1.0,
+    "repo": "RealWorldCE/CMV",
+    "url": "https://realworldce.github.io/CMV/",
+    "description": "Transplant-focused CMV education covering viral kinetics, resistance testing, and rescue-management decisions."
+  },
+  {
+    "id": "oab-module",
+    "title": "OAB Module Alternate",
+    "short": "OAB Module",
+    "topic": "Urology",
+    "icon": "medical_services",
+    "credits": 1.0,
+    "repo": "RealWorldCE/OAB-Module",
+    "url": "https://realworldce.github.io/OAB-Module/",
+    "description": "OAB education focused on patient assessment, prescribing clarity, and risk-aware treatment selection."
+  },
+  {
+    "id": "lai-module",
+    "title": "LAI Module",
+    "short": "LAI Module",
+    "topic": "Psychiatry",
+    "icon": "vaccines",
+    "credits": 1.0,
+    "repo": "RealWorldCE/LAI-Module",
+    "url": "https://realworldce.github.io/LAI-Module/",
+    "description": "Long-acting injectable workflow with practical simulation, site selection, preparation, and patient counseling steps."
+  },
+  {
+    "id": "td-module",
+    "title": "TD Module",
+    "short": "TD Module",
+    "topic": "Psychiatry",
+    "icon": "psychology",
+    "credits": 0.5,
+    "repo": "RealWorldCE/TD-Module",
+    "url": "https://realworldce.github.io/TD-Module/",
+    "description": "Clinical TD recognition, functional burden, assessment, and treatment follow-up in one focused learner experience."
+  },
+  {
+    "id": "psoriasis-module",
+    "title": "Psoriasis Module",
+    "short": "Psoriasis Module",
+    "topic": "Dermatology",
+    "icon": "dermatology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/Psoriasis-Module",
+    "url": "https://realworldce.github.io/Psoriasis-Module/",
+    "description": "Moderate-to-severe psoriasis education focused on patient burden, treatment goals, and clinical decision-making."
+  },
+  {
+    "id": "pid",
+    "title": "PID Module",
+    "short": "PID Module",
+    "topic": "Immunology / ID",
+    "icon": "immunology",
+    "credits": 1.0,
+    "repo": "RealWorldCE/PID",
+    "url": "https://realworldce.github.io/PID/",
+    "description": "Primary immunodeficiency learning focused on recognition, diagnostic workup, and care coordination."
+  }
+];
+const demoLearners = [
+  {name:'Dr. Sarah Jenkins', email:'s.jenkins@hospital.org', org:'Regional Health System'},
+  {name:'Dr. Marcus Reid', email:'m.reid@oncology.net', org:'Oncology Partners'},
+  {name:'Dr. Emily Chen', email:'e.chen@healthsys.org', org:'HealthSys Medical'},
+  {name:'Robert Vance, NP', email:'rvance@medical.org', org:'Community Care Group'},
+  {name:'Brian Hicks', email:'brianhicks211@gmail.com', org:'Real World CE'}
+];
+// ================================
+// SUPABASE CONFIG
+// 1) Run the included rwce_supabase_setup.sql file in Supabase SQL Editor.
+// 2) Replace the two values below with your Supabase Project URL and public anon key.
+// 3) Create users in Supabase Authentication. Set manager users to role='manager' in public.profiles.
+// Note: Keep the service_role key OUT of this HTML file. Only use the public anon key here.
+// ================================
+const RWCE_SUPABASE_URL = 'PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
+const RWCE_SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_PUBLIC_ANON_KEY_HERE';
+let rwceSupabase = null;
+let rwceCurrentUser = null;
+let rwceProfile = null;
+let rwceActivityCache = null;
+let rwceSupabaseReady = false;
+const moduleUuidCache = new Map();
+
+function isSupabaseConfigured(){
+  return RWCE_SUPABASE_URL.startsWith('https://') && RWCE_SUPABASE_ANON_KEY.length > 40 && !RWCE_SUPABASE_URL.includes('PASTE_') && !RWCE_SUPABASE_ANON_KEY.includes('PASTE_');
+}
+function initSupabase(){
+  if(!isSupabaseConfigured() || !window.supabase) return false;
+  if(!rwceSupabase) rwceSupabase = window.supabase.createClient(RWCE_SUPABASE_URL, RWCE_SUPABASE_ANON_KEY);
+  rwceSupabaseReady = true;
+  return true;
+}
+function getActivity(){
+  if(rwceActivityCache) return rwceActivityCache;
+  return JSON.parse(localStorage.getItem('rwceActivity') || '[]');
+}
+function setActivity(data){
+  rwceActivityCache = Array.isArray(data) ? data : [];
+  localStorage.setItem('rwceActivity', JSON.stringify(rwceActivityCache));
+}
+function setStorageModeLabel(){
+  const node=document.getElementById('storageMode');
+  if(node) node.textContent = rwceSupabaseReady ? 'Supabase PostgreSQL connected' : 'Browser localStorage demo';
+}
+async function getSupabaseProfile(user){
+  if(!rwceSupabase || !user) return null;
+  const { data, error } = await rwceSupabase.from('profiles').select('*').eq('id', user.id).single();
+  if(error){ console.warn('Profile load error:', error.message); return null; }
+  return data;
+}
+async function restoreSupabaseSession(){
+  if(!initSupabase()) return false;
+  const { data, error } = await rwceSupabase.auth.getSession();
+  if(error || !data?.session?.user) return false;
+  rwceCurrentUser = data.session.user;
+  rwceProfile = await getSupabaseProfile(rwceCurrentUser);
+  localStorage.setItem('rwcePortalAuthed','true');
+  if(rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin') localStorage.setItem('rwceManagerAuthed','true');
+  await refreshSupabaseActivity(false);
+  return true;
+}
+async function supabaseSignIn(email,password){
+  if(!initSupabase()) return { ok:false, error:'Supabase is not configured yet.' };
+  const { data, error } = await rwceSupabase.auth.signInWithPassword({ email, password });
+  if(error) return { ok:false, error:error.message };
+  rwceCurrentUser = data.user;
+  rwceProfile = await getSupabaseProfile(data.user);
+  await refreshSupabaseActivity(false);
+  return { ok:true, user:data.user, profile:rwceProfile };
+}
+async function supabaseSignOut(){
+  if(rwceSupabase) await rwceSupabase.auth.signOut();
+  rwceCurrentUser = null;
+  rwceProfile = null;
+  rwceActivityCache = null;
+}
+function activityRowFromSupabase(row){
+  return {
+    id: row.id,
+    learner: row.learner || row.full_name || 'Learner',
+    email: row.email || '',
+    org: row.organization || row.org || 'Real World CE',
+    moduleId: row.module_external_id || row.module_slug || row.module_id || row.module_uuid,
+    module: row.module || row.title || 'Module',
+    topic: row.topic || row.specialty || 'Clinical Education',
+    progress: Number(row.progress || row.completion_percent || 0),
+    time: Number(row.time || row.time_minutes || 0),
+    credits: Number(row.credits || row.credit_earned || 0),
+    status: row.status || (row.completed ? 'Completed' : 'Started'),
+    date: row.date || row.started_at || new Date().toISOString()
+  };
+}
+async function refreshSupabaseActivity(showAlert=false){
+  if(!rwceSupabaseReady && !initSupabase()) { setStorageModeLabel(); return; }
+  const { data, error } = await rwceSupabase
+    .from('manager_activity_report')
+    .select('*')
+    .order('date', { ascending:false })
+    .limit(500);
+  if(error){
+    console.warn('Supabase report load failed:', error.message);
+    if(showAlert) alert('Supabase report load failed: ' + error.message);
+    return;
+  }
+  rwceActivityCache = (data || []).map(activityRowFromSupabase);
+  localStorage.setItem('rwceActivity', JSON.stringify(rwceActivityCache));
+  setStorageModeLabel();
+  renderAll();
+}
+async function getSupabaseModuleUuid(module){
+  if(!rwceSupabaseReady && !initSupabase()) return null;
+  if(moduleUuidCache.has(module.repo)) return moduleUuidCache.get(module.repo);
+  const { data, error } = await rwceSupabase
+    .from('modules')
+    .select('id')
+    .eq('repository', module.repo)
+    .maybeSingle();
+  if(error || !data?.id){ console.warn('Module lookup failed:', module.repo, error?.message); return null; }
+  moduleUuidCache.set(module.repo, data.id);
+  return data.id;
+}
+async function saveSupabaseSession(module, localRecord){
+  if(!rwceCurrentUser || !rwceSupabaseReady) return null;
+  const moduleUuid = await getSupabaseModuleUuid(module);
+  if(!moduleUuid) return null;
+  const { data, error } = await rwceSupabase
+    .from('module_sessions')
+    .insert({
+      user_id: rwceCurrentUser.id,
+      module_id: moduleUuid,
+      time_spent_seconds: Number(localRecord.time || 0) * 60,
+      completion_percent: Number(localRecord.progress || 0),
+      completed: localRecord.status === 'Completed',
+      last_event: localRecord.status === 'Completed' ? 'module_completed' : 'module_started'
+    })
+    .select('id')
+    .single();
+  if(error){ console.warn('Session insert failed:', error.message); return null; }
+  return data.id;
+}
+async function saveSupabaseCompletion(module, localRecord){
+  if(!rwceCurrentUser || !rwceSupabaseReady) return;
+  const moduleUuid = await getSupabaseModuleUuid(module);
+  if(!moduleUuid) return;
+  const sessionId = await saveSupabaseSession(module, localRecord);
+  const { error } = await rwceSupabase
+    .from('module_completions')
+    .upsert({
+      user_id: rwceCurrentUser.id,
+      module_id: moduleUuid,
+      session_id: sessionId,
+      score: 100,
+      passed: true,
+      credit_earned: Number(module.credits || 0),
+      certificate_id: 'RWCE-' + Date.now()
+    }, { onConflict: 'user_id,module_id' });
+  if(error) console.warn('Completion upsert failed:', error.message);
+}
+function fmtDate(iso){ return new Date(iso).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'}); }
+function minutesLabel(mins){ const h=Math.floor(mins/60), m=mins%60; return h ? `${h}h ${m}m` : `${m}m`; }
+function statusClass(status){ return status==='Completed' ? 'status-complete' : status==='In Progress' ? 'status-progress' : 'status-started'; }
+function initials(name){ return name.split(/\s+/).map(n=>n[0]).slice(0,2).join('').toUpperCase(); }
+function cryptoId(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
+function setTopicFilter(topic){ const select=document.getElementById('topicFilter'); if(select){ select.value=topic; } syncTopicChips(); renderModules(); }
+function syncTopicChips(){ const topic=document.getElementById('topicFilter')?.value || 'All'; document.querySelectorAll('[data-topic-chip]').forEach(chip=>{ const active=chip.dataset.topicChip===topic; chip.classList.toggle('active', active); chip.classList.toggle('text-slate-600', !active); }); }
+
+function showOnly(viewId){
+  ['portalLogin','publicSite','adminPortal','moduleViewer'].forEach(id=>{
+    const node=document.getElementById(id);
+    if(node) node.classList.toggle('hidden-view', id!==viewId);
+  });
+}
+async function portalLogin(){
+  const u=(document.getElementById('portalUsername')?.value||'').trim();
+  const p=(document.getElementById('portalPassword')?.value||'').trim();
+  const error=document.getElementById('portalLoginError');
+  if(isSupabaseConfigured() && u.includes('@')){
+    const result = await supabaseSignIn(u, p);
+    if(result.ok){
+      localStorage.setItem('rwcePortalAuthed','true');
+      localStorage.setItem('rwceActiveUser', result.profile?.full_name || u);
+      if(error) error.classList.add('hidden-view');
+      if(result.profile?.role === 'manager' || result.profile?.role === 'admin'){
+        localStorage.setItem('rwceManagerAuthed','true');
+        enterAdminPortal();
+      } else {
+        localStorage.removeItem('rwceManagerAuthed');
+        backToMainMenu();
       }
-    })();
-  </script>
+      return;
+    }
+    if(error){ error.textContent = result.error || 'Supabase login failed.'; error.classList.remove('hidden-view'); }
+    return;
+  }
+  if(u.toLowerCase()==='demo' && p.toLowerCase()==='demo'){
+    localStorage.setItem('rwcePortalAuthed','true');
+    localStorage.setItem('rwceActiveUser',u||'Demo');
+    if(error) error.classList.add('hidden-view');
+    backToMainMenu();
+    return;
+  }
+  if(u.toLowerCase()==='manager@realworldce.org' && p==='manager123'){
+    localStorage.setItem('rwcePortalAuthed','true');
+    localStorage.setItem('rwceManagerAuthed','true');
+    localStorage.setItem('rwceActiveUser','Manager');
+    if(error) error.classList.add('hidden-view');
+    enterAdminPortal();
+    return;
+  }
+  if(error) error.classList.remove('hidden-view');
+}
+function portalQuickLogin(){
+  const u=document.getElementById('portalUsername');
+  const p=document.getElementById('portalPassword');
+  if(u) u.value='Demo';
+  if(p) p.value='Demo';
+  portalLogin();
+}
+function backToMainMenu(){
+  localStorage.setItem('rwcePortalAuthed','true');
+  const frame=document.getElementById('moduleFrame');
+  if(frame) frame.src='about:blank';
+  closeManagerLogin();
+  showOnly('publicSite');
+  renderAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+async function logoutToLogin(){
+  await supabaseSignOut();
+  localStorage.removeItem('rwcePortalAuthed');
+  localStorage.removeItem('rwceManagerAuthed');
+  closeManagerLogin();
+  const frame=document.getElementById('moduleFrame');
+  if(frame) frame.src='about:blank';
+  showOnly('portalLogin');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function enterAdminPortal(){
+  closeManagerLogin();
+  showOnly('adminPortal');
+  renderAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function openModuleViewer(url,title){
+  const frame=document.getElementById('moduleFrame');
+  const titleNode=document.getElementById('moduleViewerTitle');
+  const newTab=document.getElementById('moduleNewTabLink');
+  if(!frame){ window.open(url,'_blank','noopener,noreferrer'); return; }
+  if(titleNode) titleNode.textContent=title||'Real World CE Module';
+  if(newTab) newTab.href=url;
+  frame.src=url;
+  showOnly('moduleViewer');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function closeModuleViewer(){ backToMainMenu(); }
+
+function renderModules(){
+  const grid=document.getElementById('moduleGrid');
+  const q=(document.getElementById('moduleSearch')?.value||'').toLowerCase();
+  const topic=document.getElementById('topicFilter')?.value||'All';
+  const topics=['All', ...new Set(modules.map(m=>m.topic))];
+  const select=document.getElementById('topicFilter');
+  if(select && select.options.length!==topics.length){ select.innerHTML=topics.map(t=>`<option value="${t}">${t==='All'?'All Topics':t}</option>`).join(''); }
+  syncTopicChips();
+  const filtered=modules.filter(m=>(topic==='All'||m.topic===topic) && (`${m.title} ${m.topic} ${m.repo} ${m.description}`.toLowerCase().includes(q)));
+  grid.innerHTML = filtered.length ? filtered.map(m=>`<article class="module-card glass marketing-card p-4 sm:p-5" data-area="${m.topic}">
+    <div class="marketing-card__top"><div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${m.topic}</span></div><div class="marketing-card__badges"><span class="marketing-status-pill">Live</span><span class="marketing-format-pill">${m.credits} CME</span></div></div>
+    <div class="module-preview active-preview live-preview" aria-label="${m.title} live module preview">
+      <iframe class="module-live-frame" title="${m.title} live preview" loading="lazy" src="${m.url}" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="live-preview-fallback">Live preview could not render inside this card.<br/>Use Launch Module or Open in New Tab.</div>
+      <div class="live-preview-badge"><span class="material-symbols-outlined">sensors</span> Live View</div>
+      <div class="preview-caption"><span class="preview-title">${m.short}</span><span class="preview-subtitle">Live module • ${m.topic}</span></div>
+    </div>
+    <div class="marketing-card__body"><div class="marketing-card__eyebrow">Real World CE Learning Experience</div><h3 class="marketing-card__title">${m.title}</h3><p class="marketing-card__description">${m.description}</p><div aria-label="Module details" class="marketing-card__metadata"><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Specialty</span><strong>${m.topic}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Repository</span><strong>${m.repo}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div></div><div class="marketing-card__footer"><button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Module</button><button onclick="simulateCompletion('${m.id}')" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 text-sm font-bold">Demo Complete</button></div></div>
+  </article>`).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2 xl:col-span-3">No modules match your search.</div>`;
+  attachLivePreviewFallbacks();
+}
+
+function attachLivePreviewFallbacks(){
+  document.querySelectorAll('.module-live-frame').forEach(frame=>{
+    frame.addEventListener('error', ()=> frame.closest('.live-preview')?.classList.add('frame-error'), {once:true});
+  });
+}
+
+async function launchModule(id){
+  const m=modules.find(x=>x.id===id); if(!m) return;
+  const learner=rwceProfile ? {name:rwceProfile.full_name || rwceCurrentUser?.email || 'Learner', email:rwceProfile.email || rwceCurrentUser?.email || '', org:'Real World CE'} : demoLearners[4];
+  const record={id:cryptoId(), learner:learner.name, email:learner.email, org:learner.org, moduleId:m.id, module:m.title, topic:m.topic, progress:25, time:5, credits:0, status:'Started', date:new Date().toISOString()};
+  const data=getActivity(); data.unshift(record); setActivity(data); renderAll();
+  if(rwceSupabaseReady && rwceCurrentUser){ await saveSupabaseSession(m, record); await refreshSupabaseActivity(false); }
+  openModuleViewer(m.url, m.title);
+}
+async function simulateCompletion(id){
+  const m=modules.find(x=>x.id===id); if(!m) return;
+  const learner=rwceProfile ? {name:rwceProfile.full_name || rwceCurrentUser?.email || 'Learner', email:rwceProfile.email || rwceCurrentUser?.email || '', org:'Real World CE'} : demoLearners[Math.floor(Math.random()*demoLearners.length)];
+  const time=25+Math.floor(Math.random()*54); const record={id:cryptoId(), learner:learner.name, email:learner.email, org:learner.org, moduleId:m.id, module:m.title, topic:m.topic, progress:100, time, credits:m.credits, status:'Completed', date:new Date().toISOString()};
+  const data=getActivity(); data.unshift(record); setActivity(data); renderAll();
+  if(rwceSupabaseReady && rwceCurrentUser){ await saveSupabaseCompletion(m, record); await refreshSupabaseActivity(false); alert('Completion saved to Supabase and added to the Manager Portal.'); }
+  else alert('Demo completion added to the Manager Portal.');
+}
+function openManagerLogin(){ if(localStorage.getItem('rwceManagerAuthed')==='true'){ enterAdminPortal(); return; } document.getElementById('loginModal').classList.remove('hidden-view'); }
+function closeManagerLogin(){ document.getElementById('loginModal').classList.add('hidden-view'); }
+async function managerLogin(){
+  const email=document.getElementById('managerEmail').value.trim().toLowerCase(); const pass=document.getElementById('managerPassword').value;
+  if(isSupabaseConfigured()){
+    const result = await supabaseSignIn(email, pass);
+    const role = result.profile?.role;
+    if(result.ok && (role === 'manager' || role === 'admin')){
+      localStorage.setItem('rwcePortalAuthed','true');
+      localStorage.setItem('rwceManagerAuthed','true');
+      localStorage.setItem('rwceActiveUser', result.profile?.full_name || 'Manager');
+      const err=document.getElementById('loginError'); if(err) err.classList.add('hidden-view');
+      enterAdminPortal();
+      return;
+    }
+    const err=document.getElementById('loginError');
+    if(err){ err.textContent = result.ok ? 'This user is not a manager.' : (result.error || 'Invalid manager login.'); err.classList.remove('hidden-view'); }
+    return;
+  }
+  if(email==='manager@realworldce.org' && pass==='manager123'){
+    localStorage.setItem('rwcePortalAuthed','true');
+    localStorage.setItem('rwceManagerAuthed','true');
+    localStorage.setItem('rwceActiveUser','Manager');
+    const err=document.getElementById('loginError'); if(err) err.classList.add('hidden-view');
+    enterAdminPortal();
+  }
+  else document.getElementById('loginError').classList.remove('hidden-view');
+}
+async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwceManagerAuthed'); backToMainMenu(); }
+function showPublicSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+function showAdminTab(tab){
+  document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
+  document.getElementById('admin-'+tab).classList.remove('hidden-view');
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
+  const active=document.querySelector(`[data-tab="${tab}"]`); active.classList.add('tab-active');
+  document.getElementById('adminTitle').textContent = tab==='dashboard'?'System Overview':tab==='learners'?'User Reports':tab==='analytics'?'Module Analytics':'Settings';
+}
+function calcStats(){
+  const data=getActivity(); const completed=data.filter(x=>x.status==='Completed');
+  return {completions:completed.length, credits:completed.reduce((s,x)=>s+Number(x.credits||0),0), learners:new Set(data.map(x=>x.email)).size, modules:modules.length, avg:data.length?Math.round(data.reduce((s,x)=>s+Number(x.time||0),0)/data.length):0};
+}
+function renderStats(){ const s=calcStats(); ['statCompletions','heroCompletions'].forEach(id=>{const e=document.getElementById(id); if(e)e.textContent=s.completions.toLocaleString();}); ['statCredits','heroCredits'].forEach(id=>{const e=document.getElementById(id); if(e)e.textContent=s.credits.toFixed(1);}); ['statLearners','heroLearners'].forEach(id=>{const e=document.getElementById(id); if(e)e.textContent=s.learners.toLocaleString();}); const hm=document.getElementById('heroModules'); if(hm)hm.textContent=s.modules; const avg=document.getElementById('statAvgTime'); if(avg)avg.textContent=minutesLabel(s.avg); }
+function renderRecentTable(){
+  const tbody=document.getElementById('recentTable'); if(!tbody) return; const q=(document.getElementById('recentSearch')?.value||'').toLowerCase();
+  const rows=getActivity().filter(x=>JSON.stringify(x).toLowerCase().includes(q)).slice(0,50);
+  tbody.innerHTML = rows.length ? rows.map(x=>`<tr><td><div class="flex items-center gap-3"><div class="avatar w-9 h-9 rounded-full flex items-center justify-center text-xs font-black">${initials(x.learner)}</div><div><div class="font-bold text-medicalBlue">${x.learner}</div><div class="text-xs text-slate-500">${x.email}</div></div></div></td><td class="font-semibold">${x.module}</td><td><div class="meter"><span style="width:${x.progress}%"></span></div><div class="text-xs text-slate-500 mt-1">${x.progress}%</div></td><td>${minutesLabel(x.time)}</td><td>${Number(x.credits).toFixed(1)}</td><td><span class="status-pill ${statusClass(x.status)}">${x.status}</span></td><td>${fmtDate(x.date)}</td></tr>`).join('') : `<tr><td colspan="7" class="text-center text-slate-500 py-8">No activity yet. Launch or complete a module to create tracking records.</td></tr>`;
+}
+function renderLearnerTable(){
+  const tbody=document.getElementById('learnerTable'); if(!tbody) return; const q=(document.getElementById('learnerSearch')?.value||'').toLowerCase(); const grouped={};
+  getActivity().forEach(x=>{ grouped[x.email] ||= {learner:x.learner,email:x.email,org:x.org,modules:new Set(),time:0,credits:0,last:x.date}; grouped[x.email].modules.add(x.module); grouped[x.email].time+=Number(x.time||0); grouped[x.email].credits+=Number(x.credits||0); if(new Date(x.date)>new Date(grouped[x.email].last)) grouped[x.email].last=x.date; });
+  const rows=Object.values(grouped).filter(x=>JSON.stringify({...x,modules:[...x.modules]}).toLowerCase().includes(q));
+  tbody.innerHTML = rows.length ? rows.map(x=>`<tr><td><div class="font-bold text-medicalBlue">${x.learner}</div><div class="text-xs text-slate-500">${x.email}</div></td><td>${x.org}</td><td>${x.modules.size}</td><td>${minutesLabel(x.time)}</td><td><span class="status-pill status-complete">${x.credits.toFixed(1)} CME</span></td><td>${fmtDate(x.last)}</td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-slate-500 py-8">No learner records found.</td></tr>`;
+}
+function renderAnalytics(){
+  const grid=document.getElementById('analyticsGrid'); if(!grid) return; const data=getActivity();
+  grid.innerHTML = modules.map(m=>{ const rows=data.filter(x=>x.moduleId===m.id); const completions=rows.filter(x=>x.status==='Completed').length; const starts=rows.length; const avg=rows.length?Math.round(rows.reduce((s,x)=>s+x.time,0)/rows.length):0; const credits=rows.reduce((s,x)=>s+Number(x.credits||0),0); const pct=starts?Math.round((completions/starts)*100):0; return `<div class="analytics-card rounded-[2rem] p-6"><div class="relative z-10"><div class="flex items-start justify-between gap-4"><div><div class="text-xs text-blue-700 uppercase font-black tracking-widest">${m.topic}</div><h3 class="text-xl font-black text-medicalBlue mt-2">${m.title}</h3></div><span class="status-pill status-started">${m.credits} CME</span></div><div class="grid grid-cols-4 gap-3 mt-5 text-center"><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${starts}</div><div class="text-[10px] text-slate-500 uppercase font-black">Starts</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${completions}</div><div class="text-[10px] text-slate-500 uppercase font-black">Done</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${credits.toFixed(1)}</div><div class="text-[10px] text-slate-500 uppercase font-black">Credits</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${avg}m</div><div class="text-[10px] text-slate-500 uppercase font-black">Avg</div></div></div><div class="mt-5"><div class="flex justify-between text-xs text-slate-500 mb-2"><span>Completion Rate</span><span>${pct}%</span></div><div class="meter"><span style="width:${pct}%"></span></div></div></div></div>`; }).join('');
+}
+function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); }
+function seedDemoData(){
+  const now=Date.now(); const data=[]; for(let i=0;i<18;i++){ const m=modules[i%modules.length]; const l=demoLearners[i%demoLearners.length]; const completed=i%4!==0; data.push({id:cryptoId(), learner:l.name, email:l.email, org:l.org, moduleId:m.id, module:m.title, topic:m.topic, progress:completed?100:35+((i*7)%45), time:18+((i*9)%68), credits:completed?m.credits:0, status:completed?'Completed':'In Progress', date:new Date(now - i*86400000/1.7).toISOString()}); } setActivity(data);
+}
+function clearActivity(){ if(confirm('Clear all local demo activity records?')){ setActivity([]); renderAll(); } }
+function exportCSV(){
+  const data=getActivity(); const headers=['Learner','Email','Organization','Module','Topic','Progress','Time Minutes','Credits','Status','Date'];
+  const csv=[headers.join(','), ...data.map(x=>[x.learner,x.email,x.org,x.module,x.topic,x.progress,x.time,x.credits,x.status,fmtDate(x.date)].map(v=>`"${String(v).replaceAll('"','""')}"`).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='realworldce-manager-report.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+window.addEventListener('DOMContentLoaded', async ()=>{
+  initSupabase();
+  setStorageModeLabel();
+  if(!getActivity().length && !isSupabaseConfigured()) seedDemoData();
+  renderAll();
+  const restored = await restoreSupabaseSession();
+  if(restored){
+    if(rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin') enterAdminPortal();
+    else backToMainMenu();
+    return;
+  }
+  if(localStorage.getItem('rwceManagerAuthed')==='true') enterAdminPortal();
+  else if(localStorage.getItem('rwcePortalAuthed')==='true') backToMainMenu();
+  else showOnly('portalLogin');
+});
+</script>
 </body>
 </html>
