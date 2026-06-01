@@ -450,6 +450,60 @@
       .module-viewer-frame { height: calc(100dvh - 142px); }
     }
 
+
+    /* Badge/header overlap fix: stack long clinical areas and format badges cleanly */
+    .marketing-card__top {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      justify-content: start;
+      gap: .62rem;
+    }
+    .marketing-card__specialty {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      align-items: flex-start;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+    .marketing-card__specialty > span:last-child {
+      min-width: 0;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.2;
+    }
+    .marketing-card__badges {
+      width: 100%;
+      max-width: 100%;
+      justify-content: flex-start !important;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: .45rem;
+    }
+    .marketing-status-pill,
+    .marketing-format-pill,
+    .status-pill {
+      max-width: 100%;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.12;
+    }
+    .preview-caption .preview-title,
+    .preview-caption .preview-subtitle {
+      overflow-wrap: anywhere;
+      white-space: normal;
+      line-height: 1.16;
+    }
+    .marketing-card__metadata {
+      overflow: hidden;
+    }
+    .marketing-card__meta-item strong {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
   </style>
 </head>
 <body>
@@ -553,18 +607,7 @@
               <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Module command center</h2>
               <p class="text-slate-500 mt-1">Search, launch, and track every live clinical module from one polished command center.</p>
             </div>
-            <div class="flex flex-wrap gap-2">
-              <button class="chip active inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold" data-topic-chip="All" onclick="setTopicFilter('All')">All</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Oncology" onclick="setTopicFilter('Oncology')">Oncology</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Neurology" onclick="setTopicFilter('Neurology')">Neurology</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Primary Care" onclick="setTopicFilter('Primary Care')">Primary Care</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Dermatology" onclick="setTopicFilter('Dermatology')">Dermatology</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Urology" onclick="setTopicFilter('Urology')">Urology</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Immunology / ID" onclick="setTopicFilter('Immunology / ID')">Immunology / ID</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Psychiatry" onclick="setTopicFilter('Psychiatry')">Psychiatry</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Gastroenterology" onclick="setTopicFilter('Gastroenterology')">Gastroenterology</button>
-              <button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="Assessment" onclick="setTopicFilter('Assessment')">Assessment</button>
-            </div>
+            <div id="topicChips" class="flex flex-wrap gap-2" aria-label="Module filter tabs"></div>
           </div>
           <div class="mt-5 grid md:grid-cols-[1fr_auto] gap-3">
             <label class="relative block">
@@ -702,20 +745,35 @@
 const modules = [
   {
     "id": "prostate-parpi",
-    "title": "Prostate PARPi",
-    "short": "Prostate PARPi",
-    "topic": "Oncology",
+    "condition": "Prostate Cancer",
+    "title": "Prostate Cancer PARP Inhibitor Therapy",
+    "short": "Prostate Cancer",
+    "topic": "Hematology/Oncology",
+    "categories": [
+      "Hematology/Oncology",
+      "Urology",
+      "Data"
+    ],
+    "format": "Real World Data",
+    "formatGroup": "Data",
     "icon": "genetics",
     "credits": 1.5,
     "repo": "RealWorldCE/ProstatePARPi",
     "url": "https://realworldce.github.io/ProstatePARPi/",
-    "description": "Metastatic prostate cancer workflow focused on HRR testing, PARPi sequencing, shared decisions, and MDT adverse-event management."
+    "description": "Metastatic prostate cancer workflow focused on homologous recombination repair testing, PARP inhibitor sequencing, shared decisions, and multidisciplinary adverse-event management."
   },
   {
     "id": "cidp-module",
-    "title": "CIDP Module",
-    "short": "CIDP Module",
-    "topic": "Neurology",
+    "condition": "Chronic Inflammatory Demyelinating Polyneuropathy",
+    "title": "Chronic Inflammatory Demyelinating Polyneuropathy",
+    "short": "Chronic Inflammatory Demyelinating Polyneuropathy",
+    "topic": "Rare Disease",
+    "categories": [
+      "Rare Disease",
+      "Simulations"
+    ],
+    "format": "Real World Sim",
+    "formatGroup": "Simulations",
     "icon": "neurology",
     "credits": 1.0,
     "repo": "RealWorldCE/CIDP-Module",
@@ -724,9 +782,17 @@ const modules = [
   },
   {
     "id": "narcolepsy-type1",
+    "condition": "Narcolepsy Type 1",
     "title": "Narcolepsy Type 1",
     "short": "Narcolepsy Type 1",
-    "topic": "Neurology",
+    "topic": "Rare Disease",
+    "categories": [
+      "Rare Disease",
+      "Immunology",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "neurology",
     "credits": 1.0,
     "repo": "RealWorldCE/Narcolepsy-Type1",
@@ -735,9 +801,16 @@ const modules = [
   },
   {
     "id": "oabmodule",
-    "title": "OAB Module",
-    "short": "OAB Module",
+    "condition": "Overactive Bladder",
+    "title": "Overactive Bladder",
+    "short": "Overactive Bladder",
     "topic": "Urology",
+    "categories": [
+      "Urology",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "medical_services",
     "credits": 1.0,
     "repo": "RealWorldCE/OABModule",
@@ -746,9 +819,17 @@ const modules = [
   },
   {
     "id": "takeda-pid",
-    "title": "Takeda PID",
-    "short": "Takeda PID",
-    "topic": "Immunology / ID",
+    "condition": "Primary Immunodeficiency",
+    "title": "Primary Immunodeficiency",
+    "short": "Primary Immunodeficiency",
+    "topic": "Immunology",
+    "categories": [
+      "Immunology",
+      "Rare Disease",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "immunology",
     "credits": 1.0,
     "repo": "RealWorldCE/Takeda_PID",
@@ -757,9 +838,15 @@ const modules = [
   },
   {
     "id": "real-quiz",
-    "title": "Real Quiz",
+    "condition": "Assessment",
+    "title": "Real Quiz Assessment",
     "short": "Real Quiz",
     "topic": "Assessment",
+    "categories": [
+      "Assessments"
+    ],
+    "format": "Real Quiz",
+    "formatGroup": "Assessments",
     "icon": "quiz",
     "credits": 0.5,
     "repo": "RealWorldCE/Real-Quiz",
@@ -768,31 +855,55 @@ const modules = [
   },
   {
     "id": "psoriatic-disease",
+    "condition": "Psoriatic Disease",
     "title": "Psoriatic Disease",
     "short": "Psoriatic Disease",
-    "topic": "Dermatology",
+    "topic": "Rheumatology",
+    "categories": [
+      "Immunology",
+      "Rheumatology",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "dermatology",
     "credits": 1.0,
     "repo": "RealWorldCE/Psoriatic_Disease",
     "url": "https://realworldce.github.io/Psoriatic_Disease/",
-    "description": "Dermatology module connecting skin and joint burden with treatment goals, shared decision-making, and real-world patient impact."
+    "description": "Psoriatic disease module connecting skin and joint burden with treatment goals, shared decision-making, and real-world patient impact."
   },
   {
     "id": "myelofibrosis",
-    "title": "Myelofibrosis Module",
+    "condition": "Myelofibrosis",
+    "title": "Myelofibrosis",
     "short": "Myelofibrosis",
-    "topic": "Oncology",
+    "topic": "Hematology/Oncology",
+    "categories": [
+      "Hematology/Oncology",
+      "Rare Disease",
+      "Data"
+    ],
+    "format": "Real World Data",
+    "formatGroup": "Data",
     "icon": "genetics",
     "credits": 1.0,
     "repo": "RealWorldCE/Myelofibrosis_Module",
     "url": "https://realworldce.github.io/Myelofibrosis_Module/",
-    "description": "Oncology education focused on symptom burden, risk stratification, therapy selection, and practical management in myelofibrosis care."
+    "description": "Hematology/oncology education focused on symptom burden, risk stratification, therapy selection, and practical management in myelofibrosis care."
   },
   {
     "id": "narcolepsy",
-    "title": "Narcolepsy Module",
-    "short": "Narcolepsy Module",
-    "topic": "Neurology",
+    "condition": "Narcolepsy",
+    "title": "Narcolepsy",
+    "short": "Narcolepsy",
+    "topic": "Rare Disease",
+    "categories": [
+      "Rare Disease",
+      "Immunology",
+      "Simulations"
+    ],
+    "format": "Real World Sim",
+    "formatGroup": "Simulations",
     "icon": "neurology",
     "credits": 1.0,
     "repo": "RealWorldCE/Narcolepsy",
@@ -801,9 +912,17 @@ const modules = [
   },
   {
     "id": "takeda-ibd",
-    "title": "Takeda IBD Module",
-    "short": "IBD Module",
+    "condition": "Inflammatory Bowel Disease",
+    "title": "Inflammatory Bowel Disease",
+    "short": "Inflammatory Bowel Disease",
     "topic": "Gastroenterology",
+    "categories": [
+      "Gastroenterology",
+      "Immunology",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "gastroenterology",
     "credits": 1.0,
     "repo": "RealWorldCE/Takeda_IBDModule",
@@ -811,65 +930,53 @@ const modules = [
     "description": "Inflammatory bowel disease learning experience focused on real-world treatment decisions, patient communication, and practical care planning."
   },
   {
-    "id": "cidp",
-    "title": "CIDP",
-    "short": "CIDP",
-    "topic": "Neurology",
-    "icon": "neurology",
-    "credits": 1.0,
-    "repo": "RealWorldCE/CIDP",
-    "url": "https://realworldce.github.io/CIDP/",
-    "description": "CIDP recognition, diagnostic confidence, treatment selection, and longitudinal monitoring decisions."
-  },
-  {
     "id": "cmv",
-    "title": "CMV Module",
-    "short": "CMV Module",
-    "topic": "Immunology / ID",
+    "condition": "Cytomegalovirus",
+    "title": "Cytomegalovirus",
+    "short": "Cytomegalovirus",
+    "topic": "Infectious Disease",
+    "categories": [
+      "Infectious Disease",
+      "Simulations"
+    ],
+    "format": "Real World Sim",
+    "formatGroup": "Simulations",
     "icon": "biotech",
     "credits": 1.0,
     "repo": "RealWorldCE/CMV",
     "url": "https://realworldce.github.io/CMV/",
-    "description": "Transplant-focused CMV education covering viral kinetics, resistance testing, and rescue-management decisions."
-  },
-  {
-    "id": "oab-module",
-    "title": "OAB Module Alternate",
-    "short": "OAB Module",
-    "topic": "Urology",
-    "icon": "medical_services",
-    "credits": 1.0,
-    "repo": "RealWorldCE/OAB-Module",
-    "url": "https://realworldce.github.io/OAB-Module/",
-    "description": "OAB education focused on patient assessment, prescribing clarity, and risk-aware treatment selection."
-  },
-  {
-    "id": "lai-module",
-    "title": "LAI Module",
-    "short": "LAI Module",
-    "topic": "Psychiatry",
-    "icon": "vaccines",
-    "credits": 1.0,
-    "repo": "RealWorldCE/LAI-Module",
-    "url": "https://realworldce.github.io/LAI-Module/",
-    "description": "Long-acting injectable workflow with practical simulation, site selection, preparation, and patient counseling steps."
+    "description": "Transplant-focused cytomegalovirus education covering viral kinetics, resistance testing, and rescue-management decisions."
   },
   {
     "id": "td-module",
-    "title": "TD Module",
-    "short": "TD Module",
+    "condition": "Tardive Dyskinesia",
+    "title": "Tardive Dyskinesia",
+    "short": "Tardive Dyskinesia",
     "topic": "Psychiatry",
+    "categories": [
+      "Psychiatry",
+      "Simulations"
+    ],
+    "format": "Real World Sim",
+    "formatGroup": "Simulations",
     "icon": "psychology",
     "credits": 0.5,
     "repo": "RealWorldCE/TD-Module",
     "url": "https://realworldce.github.io/TD-Module/",
-    "description": "Clinical TD recognition, functional burden, assessment, and treatment follow-up in one focused learner experience."
+    "description": "Clinical tardive dyskinesia recognition, functional burden, assessment, and treatment follow-up in one focused learner experience."
   },
   {
     "id": "psoriasis-module",
-    "title": "Psoriasis Module",
-    "short": "Psoriasis Module",
-    "topic": "Dermatology",
+    "condition": "Psoriasis",
+    "title": "Psoriasis",
+    "short": "Psoriasis",
+    "topic": "Immunology",
+    "categories": [
+      "Immunology",
+      "Patients"
+    ],
+    "format": "Real World Patient",
+    "formatGroup": "Patients",
     "icon": "dermatology",
     "credits": 1.0,
     "repo": "RealWorldCE/Psoriasis-Module",
@@ -878,15 +985,39 @@ const modules = [
   },
   {
     "id": "pid",
-    "title": "PID Module",
-    "short": "PID Module",
-    "topic": "Immunology / ID",
+    "condition": "Primary Immunodeficiency",
+    "title": "Primary Immunodeficiency Simulation",
+    "short": "Primary Immunodeficiency",
+    "topic": "Immunology",
+    "categories": [
+      "Immunology",
+      "Rare Disease",
+      "Simulations"
+    ],
+    "format": "Real World Sim",
+    "formatGroup": "Simulations",
     "icon": "immunology",
     "credits": 1.0,
     "repo": "RealWorldCE/PID",
     "url": "https://realworldce.github.io/PID/",
     "description": "Primary immunodeficiency learning focused on recognition, diagnostic workup, and care coordination."
   }
+];
+const moduleFilterTabs = [
+  'All',
+  'Hematology/Oncology',
+  'Infectious Disease',
+  'Immunology',
+  'Gastroenterology',
+  'Rheumatology',
+  'Urology',
+  'Psychiatry',
+  'Rare Disease',
+  'Simulations',
+  'Patients',
+  'Data',
+  'Assessments',
+  'Cases'
 ];
 const demoLearners = [
   {name:'Dr. Sarah Jenkins', email:'s.jenkins@hospital.org', org:'Regional Health System'},
@@ -1053,6 +1184,27 @@ function initials(name){ return name.split(/\s+/).map(n=>n[0]).slice(0,2).join('
 function cryptoId(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
 function setTopicFilter(topic){ const select=document.getElementById('topicFilter'); if(select){ select.value=topic; } syncTopicChips(); renderModules(); }
 function syncTopicChips(){ const topic=document.getElementById('topicFilter')?.value || 'All'; document.querySelectorAll('[data-topic-chip]').forEach(chip=>{ const active=chip.dataset.topicChip===topic; chip.classList.toggle('active', active); chip.classList.toggle('text-slate-600', !active); }); }
+function renderFilterControls(){
+  const select=document.getElementById('topicFilter');
+  const chips=document.getElementById('topicChips');
+  const current=(select?.value && moduleFilterTabs.includes(select.value)) ? select.value : 'All';
+  if(select){
+    select.innerHTML=moduleFilterTabs.map(t=>`<option value="${t}">${t==='All'?'All Modules':t}</option>`).join('');
+    select.value=current;
+  }
+  if(chips){
+    chips.innerHTML=moduleFilterTabs.map(t=>`<button class="chip inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-bold text-slate-600" data-topic-chip="${t}" onclick="setTopicFilter('${t}')">${t}</button>`).join('');
+  }
+  syncTopicChips();
+}
+function moduleMatchesFilter(module, filter){
+  if(filter==='All') return true;
+  const categories=Array.isArray(module.categories) ? module.categories : [module.topic].filter(Boolean);
+  return categories.includes(filter) || module.formatGroup===filter || module.topic===filter;
+}
+function moduleSearchText(module){
+  return `${module.title} ${module.short} ${module.condition || ''} ${module.topic} ${(module.categories||[]).join(' ')} ${module.format || ''} ${module.formatGroup || ''} ${module.repo} ${module.description}`.toLowerCase();
+}
 
 function showOnly(viewId){
   ['portalLogin','publicSite','adminPortal','moduleViewer'].forEach(id=>{
@@ -1146,22 +1298,20 @@ function closeModuleViewer(){ backToMainMenu(); }
 
 function renderModules(){
   const grid=document.getElementById('moduleGrid');
+  if(!grid) return;
+  renderFilterControls();
   const q=(document.getElementById('moduleSearch')?.value||'').toLowerCase();
   const topic=document.getElementById('topicFilter')?.value||'All';
-  const topics=['All', ...new Set(modules.map(m=>m.topic))];
-  const select=document.getElementById('topicFilter');
-  if(select && select.options.length!==topics.length){ select.innerHTML=topics.map(t=>`<option value="${t}">${t==='All'?'All Topics':t}</option>`).join(''); }
-  syncTopicChips();
-  const filtered=modules.filter(m=>(topic==='All'||m.topic===topic) && (`${m.title} ${m.topic} ${m.repo} ${m.description}`.toLowerCase().includes(q)));
-  grid.innerHTML = filtered.length ? filtered.map(m=>`<article class="module-card glass marketing-card p-4 sm:p-5" data-area="${m.topic}">
-    <div class="marketing-card__top"><div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${m.topic}</span></div><div class="marketing-card__badges"><span class="marketing-status-pill">Live</span><span class="marketing-format-pill">${m.credits} CME</span></div></div>
+  const filtered=modules.filter(m=>moduleMatchesFilter(m, topic) && moduleSearchText(m).includes(q));
+  grid.innerHTML = filtered.length ? filtered.map(m=>`<article class="module-card glass marketing-card p-4 sm:p-5" data-area="${m.topic}" data-format="${m.formatGroup}">
+    <div class="marketing-card__top"><div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${m.topic}</span></div><div class="marketing-card__badges"><span class="marketing-status-pill">Live</span><span class="marketing-format-pill">${m.format}</span></div></div>
     <div class="module-preview active-preview live-preview" aria-label="${m.title} live module preview">
       <iframe class="module-live-frame" title="${m.title} live preview" loading="lazy" src="${m.url}" referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="live-preview-fallback">Live preview could not render inside this card.<br/>Use Launch Module or Open in New Tab.</div>
       <div class="live-preview-badge"><span class="material-symbols-outlined">sensors</span> Live View</div>
-      <div class="preview-caption"><span class="preview-title">${m.short}</span><span class="preview-subtitle">Live module • ${m.topic}</span></div>
+      <div class="preview-caption"><span class="preview-title">${m.short}</span><span class="preview-subtitle">${m.format} • ${m.topic}</span></div>
     </div>
-    <div class="marketing-card__body"><div class="marketing-card__eyebrow">Real World CE Learning Experience</div><h3 class="marketing-card__title">${m.title}</h3><p class="marketing-card__description">${m.description}</p><div aria-label="Module details" class="marketing-card__metadata"><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Specialty</span><strong>${m.topic}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Repository</span><strong>${m.repo}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div></div><div class="marketing-card__footer"><button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Module</button><button onclick="simulateCompletion('${m.id}')" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 text-sm font-bold">Demo Complete</button></div></div>
+    <div class="marketing-card__body"><div class="marketing-card__eyebrow">${m.format} Learning Experience</div><h3 class="marketing-card__title">${m.title}</h3><p class="marketing-card__description">${m.description}</p><div aria-label="Module details" class="marketing-card__metadata"><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Clinical Area</span><strong>${m.topic}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Format</span><strong>${m.format}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div></div><div class="marketing-card__footer"><button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Module</button><button onclick="simulateCompletion('${m.id}')" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 text-sm font-bold">Demo Complete</button></div></div>
   </article>`).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2 xl:col-span-3">No modules match your search.</div>`;
   attachLivePreviewFallbacks();
 }
