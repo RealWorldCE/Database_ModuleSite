@@ -43,7 +43,7 @@
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    html, body { max-width: 100%; overflow-x: hidden; }
+    html, body { max-width: 100%; overflow-x: hidden; overflow-anchor: none; }
     body {
       font-family: Inter, sans-serif;
       min-height: 100vh;
@@ -261,6 +261,15 @@
     .preview-window__tiles span { height:2.1rem; border-radius:.72rem; background:rgba(255,255,255,.75); border:1px solid rgba(147,197,253,.32); box-shadow:inset 0 1px 0 rgba(255,255,255,.85); }
     .active-preview .preview-caption { z-index:3; }
 
+    /* Prevent search/filter re-rendering from pulling the page down */
+    #modules,
+    #moduleGrid,
+    .module-card,
+    .module-preview,
+    .module-live-frame {
+      overflow-anchor: none;
+    }
+
     .live-preview { background:#ffffff; }
     .module-live-frame {
       position:absolute;
@@ -424,6 +433,23 @@
       color: #334155;
       box-shadow: 0 12px 26px rgba(15,23,42,.06);
     }
+    .logged-in-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      min-height:2.5rem;
+      padding:.55rem .85rem;
+      border-radius:999px;
+      border:1px solid rgba(147,197,253,.42);
+      background:rgba(239,246,255,.86);
+      color:#1e3a8a;
+      font-size:.78rem;
+      font-weight:900;
+      box-shadow:0 12px 26px rgba(37,99,235,.07);
+      white-space:nowrap;
+    }
+    .logged-in-pill .material-symbols-outlined { font-size:17px; }
+    .logged-in-pill strong { color:#0f2438; }
     #moduleViewer {
       background:
         radial-gradient(760px 420px at 10% 0%, rgba(142,197,234,.22), transparent 62%),
@@ -529,36 +555,35 @@
           <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Password</span>
           <input autocomplete="current-password" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalPassword" placeholder="Demo" type="password" value="Demo"/>
         </label>
-        <div class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700" id="portalLoginError">Please enter Demo for both username and password, or use the manager credentials.</div>
+        <div class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700" id="portalLoginError">Please enter valid portal credentials.</div>
         <button class="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-black" type="submit">
           <span class="material-symbols-outlined text-[20px]">login</span> Enter Module Portal
         </button>
         <button class="w-full rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-blue-100 hover:bg-white/15" onclick="portalQuickLogin()" type="button">Quick Demo Access</button>
       </form>
-      <div class="mt-5 text-center text-[11px] font-semibold text-blue-100/60">Demo login: Demo / Demo · Manager login: manager@realworldce.org / manager123</div>
+      <div class="mt-5 text-center text-[11px] font-semibold text-blue-100/60">Demo login: Demo / Demo</div>
     </div>
   </section>
 
   <div id="publicSite" class="hidden-view min-h-screen">
     <header class="site-header sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="brand-mark w-11 h-11 rounded-2xl flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-white">public</span>
-          </div>
+        <div class="flex items-center min-w-0">
           <div class="min-w-0">
             <div class="font-black tracking-tight text-lg sm:text-xl text-medicalBlue uppercase leading-none">Real World <span class="text-blue-600">CE</span></div>
-            <div class="text-[11px] sm:text-sm text-slate-500 font-medium mt-1">Clinical learning portal with manager reporting</div>
+            <div class="text-[11px] sm:text-sm text-slate-500 font-medium mt-1">Clinical learning portal</div>
           </div>
         </div>
         <nav class="hidden lg:flex items-center gap-3 text-sm">
           <button onclick="showPublicSection('modules')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Library</button>
-          <button onclick="openManagerLogin()" class="btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Login</button>
-          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Login Screen</button>
+          <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Login</button>
+          <div class="logged-in-pill" title="Current signed-in user"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">Demo</strong></div>
+          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
         </nav>
-        <div class="lg:hidden flex gap-2">
-          <button onclick="openManagerLogin()" class="btn-primary px-4 py-2 rounded-full font-black text-sm inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Manager</button>
-          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 bg-white/80 text-slate-600 font-bold text-sm">Login</button>
+        <div class="lg:hidden flex flex-wrap gap-2">
+          <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">Demo</strong></div>
+          <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-sm inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Manager</button>
+          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 bg-white/80 text-slate-600 font-bold text-sm inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
         </div>
       </div>
     </header>
@@ -569,13 +594,13 @@
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-5">
               <span class="px-3 py-1 rounded-full bg-white/12 border border-white/15 text-[11px] font-black uppercase tracking-[0.18em]">Launch Library</span>
-              <span class="px-3 py-1 rounded-full bg-emerald-500/90 text-[11px] font-black uppercase tracking-[0.18em]">Manager Reporting</span>
+              <span class="manager-only hidden-view px-3 py-1 rounded-full bg-emerald-500/90 text-[11px] font-black uppercase tracking-[0.18em]">Manager Reporting</span>
             </div>
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.02] max-w-4xl">Bringing the <span class="text-skyBrand">Real World</span> Into Clinical Education.</h1>
             <p class="mt-5 text-blue-100/85 text-lg leading-8 max-w-2xl">A clinical education platform built to connect real patient decisions, real practice challenges, and real-world learning.</p>
             <div class="mt-8 flex flex-col sm:flex-row gap-3">
               <button onclick="document.getElementById('moduleGrid').scrollIntoView({behavior:'smooth'})" class="btn-light inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl font-bold"><span class="material-symbols-outlined text-[20px]">apps</span> Browse Modules</button>
-              <button onclick="openManagerLogin()" class="inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl border border-white/20 bg-white/10 font-bold hover:bg-white/15 transition"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Manager Portal</button>
+              <button onclick="openManagerLogin()" class="manager-only hidden-view inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl border border-white/20 bg-white/10 font-bold hover:bg-white/15 transition"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Manager Portal</button>
             </div>
           </div>
           <div class="glass rounded-3xl p-6 shadow-soft text-slate-900">
@@ -598,34 +623,57 @@
     </section>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+      <section id="featuredExperiences" class="mb-8">
+        <div class="glass rounded-[2rem] p-5 sm:p-6 shadow-soft">
+          <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
+            <div>
+              <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Featured Experiences</div>
+              <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Featured Modules</h2>
+              <p class="text-slate-500 mt-1">Browse modules by the Real World CE experience type.</p>
+            </div>
+            <button onclick="setTopicFilter('All')" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">apps</span>View All Modules</button>
+          </div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <button onclick="setTopicFilter('Simulations'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
+              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">play_circle</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Sim</div><div class="mt-1 text-sm text-slate-500 leading-6">Interactive simulation modules.</div></div>
+            </button>
+            <button onclick="setTopicFilter('Patients'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
+              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">clinical_notes</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Patient</div><div class="mt-1 text-sm text-slate-500 leading-6">Patient-centered learning modules.</div></div>
+            </button>
+            <button onclick="setTopicFilter('Data'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
+              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">database</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Data</div><div class="mt-1 text-sm text-slate-500 leading-6">Data-driven clinical education.</div></div>
+            </button>
+            <button onclick="setTopicFilter('Assessments'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
+              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">quiz</span><div class="mt-3 text-lg font-black text-medicalBlue">Real Quiz</div><div class="mt-1 text-sm text-slate-500 leading-6">Assessment-based activities.</div></div>
+            </button>
+            <button onclick="setTopicFilter('Cases'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
+              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">assignment</span><div class="mt-3 text-lg font-black text-medicalBlue">Real Case</div><div class="mt-1 text-sm text-slate-500 leading-6">Case-based learning modules.</div></div>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section id="modules" class="space-y-6 mb-12">
         <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Module Library</div>
               <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Module command center</h2>
-              <p class="text-slate-500 mt-1">Search, launch, and track every live clinical module from one polished command center.</p>
+              <p class="text-slate-500 mt-1">Search, launch, and track every live clinical module from the command center.</p>
             </div>
             <div id="topicChips" class="flex flex-wrap gap-2" aria-label="Module filter tabs"></div>
           </div>
           <div class="mt-5 grid md:grid-cols-[1fr_auto] gap-3">
             <label class="relative block">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-              <input id="moduleSearch" oninput="renderModules()" class="glass-soft w-full h-12 rounded-2xl pl-12 pr-4 text-sm font-medium focus:border-blue-400 focus:ring-4 focus:ring-blue-50" placeholder="Search by module, specialty, topic, or format..." type="text" />
+              <input id="moduleSearch" oninput="renderModules({preserveScroll:true})" class="glass-soft w-full h-12 rounded-2xl pl-12 pr-4 text-sm font-medium focus:border-blue-400 focus:ring-4 focus:ring-blue-50" placeholder="Search by module, specialty, topic, or format..." type="text" />
             </label>
-            <select id="topicFilter" onchange="syncTopicChips(); renderModules()" class="glass-soft h-12 w-full md:w-auto rounded-2xl px-4 md:px-5 text-sm font-bold"></select>
+            <select id="topicFilter" onchange="syncTopicChips(); renderModules({preserveScroll:true})" class="glass-soft h-12 w-full md:w-auto rounded-2xl px-4 md:px-5 text-sm font-bold"></select>
           </div>
         </div>
         <div id="moduleGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
       </section>
 
-      <section id="about" class="glass rounded-[2rem] p-8 mb-12 track-card">
-        <div class="relative z-10">
-          <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Platform Build</div>
-          <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1 mb-3">How this connects to your module site</h2>
-          <p class="text-slate-600 leading-7 max-w-4xl">Each module launch creates a local learner activity record. In a real LMS build, this same activity would be sent to your backend database or third-party LMS credit tracker. The manager portal is hidden until a manager logs in.</p>
-        </div>
-      </section>
     </main>
   </div>
 
@@ -680,6 +728,7 @@
         <header class="admin-topbar sticky top-0 z-30 px-5 md:px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div><h1 id="adminTitle" class="text-3xl font-black tracking-tight text-medicalBlue">System Overview</h1><p class="text-slate-500 mt-1">Manager-only tracking for learner credits, time spent, and module completion.</p></div>
           <div class="flex flex-wrap gap-3">
+            <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">Manager</strong></div>
             <button onclick="backToMainMenu()" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">home</span>Back to Main Menu</button>
             <button onclick="seedDemoData(); renderAll();" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 font-bold text-sm text-slate-700">Load Demo Data</button>
             <button onclick="exportCSV()" class="btn-primary px-4 py-3 rounded-2xl font-bold text-sm flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">download</span>Export CSV</button>
@@ -731,6 +780,7 @@
           <div class="text-[10px] uppercase tracking-[0.18em] font-black text-blue-700">Module Viewer</div>
           <div class="truncate text-sm sm:text-base font-black text-medicalBlue" id="moduleViewerTitle">Real World CE Module</div>
         </div>
+        <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">Demo</strong></div>
         <a id="moduleNewTabLink" class="btn-primary inline-flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black" href="#" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined text-[18px]">open_in_new</span>Open in New Tab</a>
       </div>
     </div>
@@ -741,6 +791,28 @@
   </section>
 
 <script>
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+function clearPortalHash(){
+  if(window.location.hash){
+    try { history.replaceState(null, document.title, window.location.pathname + window.location.search); } catch(e) {}
+  }
+}
+function forcePortalTop(){
+  clearPortalHash();
+  const setTop = () => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+  };
+  setTop();
+  requestAnimationFrame(() => {
+    setTop();
+    requestAnimationFrame(setTop);
+  });
+  [75, 200, 450, 800].forEach(delay => window.setTimeout(setTop, delay));
+}
 const modules = [
   {
     "id": "prostate-parpi",
@@ -1075,6 +1147,7 @@ async function restoreSupabaseSession(){
   rwceCurrentUser = data.session.user;
   rwceProfile = await getSupabaseProfile(rwceCurrentUser);
   localStorage.setItem('rwcePortalAuthed','true');
+  localStorage.setItem('rwceActiveUser', rwceProfile?.full_name || rwceCurrentUser.email || 'Learner');
   if(rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin') localStorage.setItem('rwceManagerAuthed','true');
   await refreshSupabaseActivity(false);
   return true;
@@ -1181,7 +1254,7 @@ function minutesLabel(mins){ const h=Math.floor(mins/60), m=mins%60; return h ? 
 function statusClass(status){ return status==='Completed' ? 'status-complete' : status==='In Progress' ? 'status-progress' : 'status-started'; }
 function initials(name){ return name.split(/\s+/).map(n=>n[0]).slice(0,2).join('').toUpperCase(); }
 function cryptoId(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
-function setTopicFilter(topic){ const select=document.getElementById('topicFilter'); if(select){ select.value=topic; } syncTopicChips(); renderModules(); }
+function setTopicFilter(topic){ const select=document.getElementById('topicFilter'); if(select){ select.value=topic; } syncTopicChips(); renderModules({preserveScroll:true}); }
 function syncTopicChips(){ const topic=document.getElementById('topicFilter')?.value || 'All'; document.querySelectorAll('[data-topic-chip]').forEach(chip=>{ const active=chip.dataset.topicChip===topic; chip.classList.toggle('active', active); chip.classList.toggle('text-slate-600', !active); }); }
 function renderFilterControls(){
   const select=document.getElementById('topicFilter');
@@ -1210,6 +1283,22 @@ function showOnly(viewId){
     const node=document.getElementById(id);
     if(node) node.classList.toggle('hidden-view', id!==viewId);
   });
+  updateManagerVisibility();
+}
+function isManagerUser(){
+  return localStorage.getItem('rwceManagerAuthed') === 'true' || rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin';
+}
+function getActiveUserName(){
+  return localStorage.getItem('rwceActiveUser') || rwceProfile?.full_name || rwceCurrentUser?.email || 'Demo';
+}
+function updateActiveUserDisplay(){
+  const name=getActiveUserName();
+  document.querySelectorAll('.active-user-label').forEach(node=>{ node.textContent=name; });
+}
+function updateManagerVisibility(){
+  const show=isManagerUser();
+  document.querySelectorAll('.manager-only').forEach(node=>node.classList.toggle('hidden-view', !show));
+  updateActiveUserDisplay();
 }
 async function portalLogin(){
   const u=(document.getElementById('portalUsername')?.value||'').trim();
@@ -1263,24 +1352,32 @@ function backToMainMenu(){
   if(frame) frame.src='about:blank';
   closeManagerLogin();
   showOnly('publicSite');
+  updateManagerVisibility();
   renderAll();
-  window.scrollTo({top:0, behavior:'smooth'});
+  forcePortalTop();
 }
 async function logoutToLogin(){
   await supabaseSignOut();
   localStorage.removeItem('rwcePortalAuthed');
   localStorage.removeItem('rwceManagerAuthed');
+  localStorage.removeItem('rwceActiveUser');
   closeManagerLogin();
   const frame=document.getElementById('moduleFrame');
   if(frame) frame.src='about:blank';
   showOnly('portalLogin');
-  window.scrollTo({top:0, behavior:'smooth'});
+  forcePortalTop();
 }
 function enterAdminPortal(){
+  if(!isManagerUser()){
+    closeManagerLogin();
+    showOnly('publicSite');
+    return;
+  }
   closeManagerLogin();
   showOnly('adminPortal');
+  updateManagerVisibility();
   renderAll();
-  window.scrollTo({top:0, behavior:'smooth'});
+  forcePortalTop();
 }
 function openModuleViewer(url,title){
   const frame=document.getElementById('moduleFrame');
@@ -1291,11 +1388,23 @@ function openModuleViewer(url,title){
   if(newTab) newTab.href=url;
   frame.src=url;
   showOnly('moduleViewer');
-  window.scrollTo({top:0, behavior:'smooth'});
+  forcePortalTop();
 }
 function closeModuleViewer(){ backToMainMenu(); }
 
-function renderModules(){
+function restoreScrollPosition(x, y, activeElementId){
+  window.scrollTo(x, y);
+  const activeElement = activeElementId ? document.getElementById(activeElementId) : null;
+  if(activeElement && document.activeElement !== activeElement){
+    try { activeElement.focus({preventScroll:true}); } catch(e) { activeElement.focus(); }
+  }
+}
+
+function renderModules(options={}){
+  const preserveScroll = !!options.preserveScroll;
+  const previousScrollX = window.scrollX;
+  const previousScrollY = window.scrollY;
+  const activeElementId = document.activeElement?.id || '';
   const grid=document.getElementById('moduleGrid');
   if(!grid) return;
   renderFilterControls();
@@ -1313,6 +1422,11 @@ function renderModules(){
     <div class="marketing-card__body"><div class="marketing-card__eyebrow">${m.format} Learning Experience</div><h3 class="marketing-card__title">${m.title}</h3><p class="marketing-card__description">${m.description}</p><div aria-label="Module details" class="marketing-card__metadata"><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Clinical Area</span><strong>${m.topic}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Format</span><strong>${m.format}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div></div><div class="marketing-card__footer"><button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Module</button><button onclick="simulateCompletion('${m.id}')" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 text-sm font-bold">Demo Complete</button></div></div>
   </article>`).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2 xl:col-span-3">No modules match your search.</div>`;
   attachLivePreviewFallbacks();
+  if(preserveScroll){
+    restoreScrollPosition(previousScrollX, previousScrollY, activeElementId);
+    requestAnimationFrame(()=>restoreScrollPosition(previousScrollX, previousScrollY, activeElementId));
+    setTimeout(()=>restoreScrollPosition(previousScrollX, previousScrollY, activeElementId), 75);
+  }
 }
 
 function attachLivePreviewFallbacks(){
@@ -1337,7 +1451,12 @@ async function simulateCompletion(id){
   if(rwceSupabaseReady && rwceCurrentUser){ await saveSupabaseCompletion(m, record); await refreshSupabaseActivity(false); alert('Completion saved to Supabase and added to the Manager Portal.'); }
   else alert('Demo completion added to the Manager Portal.');
 }
-function openManagerLogin(){ if(localStorage.getItem('rwceManagerAuthed')==='true'){ enterAdminPortal(); return; } document.getElementById('loginModal').classList.remove('hidden-view'); }
+function openManagerLogin(){
+  if(isManagerUser()){ enterAdminPortal(); return; }
+  const err=document.getElementById('portalLoginError');
+  if(err){ err.textContent='Manager access requires manager credentials from the main login screen.'; err.classList.remove('hidden-view'); }
+  showOnly('portalLogin');
+}
 function closeManagerLogin(){ document.getElementById('loginModal').classList.add('hidden-view'); }
 async function managerLogin(){
   const email=document.getElementById('managerEmail').value.trim().toLowerCase(); const pass=document.getElementById('managerPassword').value;
@@ -1365,7 +1484,7 @@ async function managerLogin(){
   }
   else document.getElementById('loginError').classList.remove('hidden-view');
 }
-async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwceManagerAuthed'); backToMainMenu(); }
+async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwcePortalAuthed'); localStorage.removeItem('rwceManagerAuthed'); localStorage.removeItem('rwceActiveUser'); updateManagerVisibility(); showOnly('portalLogin'); forcePortalTop(); }
 function showPublicSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function showAdminTab(tab){
   document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
@@ -1394,7 +1513,7 @@ function renderAnalytics(){
   const grid=document.getElementById('analyticsGrid'); if(!grid) return; const data=getActivity();
   grid.innerHTML = modules.map(m=>{ const rows=data.filter(x=>x.moduleId===m.id); const completions=rows.filter(x=>x.status==='Completed').length; const starts=rows.length; const avg=rows.length?Math.round(rows.reduce((s,x)=>s+x.time,0)/rows.length):0; const credits=rows.reduce((s,x)=>s+Number(x.credits||0),0); const pct=starts?Math.round((completions/starts)*100):0; return `<div class="analytics-card rounded-[2rem] p-6"><div class="relative z-10"><div class="flex items-start justify-between gap-4"><div><div class="text-xs text-blue-700 uppercase font-black tracking-widest">${m.topic}</div><h3 class="text-xl font-black text-medicalBlue mt-2">${m.title}</h3></div><span class="status-pill status-started">${m.credits} CME</span></div><div class="grid grid-cols-4 gap-3 mt-5 text-center"><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${starts}</div><div class="text-[10px] text-slate-500 uppercase font-black">Starts</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${completions}</div><div class="text-[10px] text-slate-500 uppercase font-black">Done</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${credits.toFixed(1)}</div><div class="text-[10px] text-slate-500 uppercase font-black">Credits</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${avg}m</div><div class="text-[10px] text-slate-500 uppercase font-black">Avg</div></div></div><div class="mt-5"><div class="flex justify-between text-xs text-slate-500 mb-2"><span>Completion Rate</span><span>${pct}%</span></div><div class="meter"><span style="width:${pct}%"></span></div></div></div></div>`; }).join('');
 }
-function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); }
+function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); updateActiveUserDisplay(); }
 function seedDemoData(){
   const now=Date.now(); const data=[]; for(let i=0;i<18;i++){ const m=modules[i%modules.length]; const l=demoLearners[i%demoLearners.length]; const completed=i%4!==0; data.push({id:cryptoId(), learner:l.name, email:l.email, org:l.org, moduleId:m.id, module:m.title, topic:m.topic, progress:completed?100:35+((i*7)%45), time:18+((i*9)%68), credits:completed?m.credits:0, status:completed?'Completed':'In Progress', date:new Date(now - i*86400000/1.7).toISOString()}); } setActivity(data);
 }
@@ -1408,16 +1527,18 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   initSupabase();
   setStorageModeLabel();
   if(!getActivity().length && !isSupabaseConfigured()) seedDemoData();
+  // Always begin at the login page on a fresh page load.
+  // This prevents previously stored localStorage or Supabase sessions from bypassing login.
+  await supabaseSignOut();
+  localStorage.removeItem('rwcePortalAuthed');
+  localStorage.removeItem('rwceManagerAuthed');
+  localStorage.removeItem('rwceActiveUser');
+  rwceCurrentUser = null;
+  rwceProfile = null;
+  updateManagerVisibility();
+  showOnly('portalLogin');
   renderAll();
-  const restored = await restoreSupabaseSession();
-  if(restored){
-    if(rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin') enterAdminPortal();
-    else backToMainMenu();
-    return;
-  }
-  if(localStorage.getItem('rwceManagerAuthed')==='true') enterAdminPortal();
-  else if(localStorage.getItem('rwcePortalAuthed')==='true') backToMainMenu();
-  else showOnly('portalLogin');
+  forcePortalTop();
 });
 </script>
 </body>
