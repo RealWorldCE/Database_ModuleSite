@@ -545,6 +545,71 @@
     .mobile-chip-row::-webkit-scrollbar { display:none; }
     .featured-kicker { display:inline-flex; align-items:center; width:fit-content; border-radius:999px; background:rgba(37,99,235,.08); border:1px solid rgba(147,197,253,.36); padding:.32rem .55rem; }
     .featured-reason { max-width:28rem; }
+    .featured-launch-card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(226,232,240,.95);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: 0 10px 22px rgba(15,23,42,.045);
+      overflow: hidden;
+    }
+    .featured-launch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .85rem;
+      min-width: 0;
+    }
+    .featured-launch-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .featured-launch-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      gap: .38rem;
+      min-width: 6.4rem;
+      min-height: 2.55rem;
+      padding: .72rem 1rem;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: .95rem;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #0ea5e9 100%) !important;
+      color: #fff !important;
+      box-shadow: 0 14px 30px rgba(37,99,235,.22);
+      font-size: .88rem;
+      font-weight: 950;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .featured-launch-action:hover,
+    .featured-launch-action:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(37,99,235,.28);
+      outline: none;
+    }
+    .featured-launch-action .material-symbols-outlined {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px !important;
+      line-height: 1;
+    }
+    @media (max-width: 640px) {
+      .featured-launch-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .featured-launch-action {
+        width: 100%;
+        min-width: 0;
+      }
+    }
     .tracked-link, .view-pill, .view-badge { max-width:100%; overflow-wrap:anywhere; word-break:normal; }
     #modules .command-center-card { border-radius:1.55rem !important; padding:1.35rem 1.55rem 1.55rem !important; }
     #modules .command-center-top { display:grid !important; grid-template-columns:minmax(15rem,19rem) minmax(0,1fr) !important; gap:1.5rem !important; align-items:start !important; }
@@ -683,24 +748,24 @@
               <span class="material-symbols-outlined text-blue-500 text-[30px]">rocket_launch</span>
             </div>
             <div class="space-y-4">
-              <div class="rounded-2xl bg-white border border-slate-200 p-4">
-                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div>
+              <div class="featured-launch-card">
+                <div class="featured-launch-row">
+                  <div class="featured-launch-copy">
                     <div class="font-bold text-slate-800">Tardive Dyskinesia</div>
                     <div class="featured-kicker mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700">High-impact psychiatry module</div>
                     <p class="featured-reason mt-1 text-xs leading-relaxed text-slate-500 font-semibold">Featured for clinical impact: recognition, functional burden, assessment, and treatment follow-up in one focused experience.</p>
                   </div>
-                  <button onclick="launchModule('td-module')" class="inline-flex w-full sm:w-auto justify-center items-center gap-1 px-3 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition tracked-link"><span class="material-symbols-outlined text-[16px]">play_arrow</span> Open</button>
+                  <button onclick="launchModule('td-module')" class="featured-launch-action" type="button"><span class="material-symbols-outlined">play_arrow</span><span>Open</span></button>
                 </div>
               </div>
-              <div class="rounded-2xl bg-white border border-slate-200 p-4">
-                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div>
+              <div class="featured-launch-card">
+                <div class="featured-launch-row">
+                  <div class="featured-launch-copy">
                     <div class="font-bold text-slate-800">Prostate Cancer PARP Inhibitor Therapy</div>
                     <div class="featured-kicker mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700">Priority hematology/oncology update</div>
                     <p class="featured-reason mt-1 text-xs leading-relaxed text-slate-500 font-semibold">Featured for workflow relevance: HRR testing, PARP inhibitor sequencing, shared decisions, and MDT adverse-event management.</p>
                   </div>
-                  <button onclick="launchModule('prostate-parpi')" class="inline-flex w-full sm:w-auto justify-center items-center gap-1 px-3 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition tracked-link"><span class="material-symbols-outlined text-[16px]">play_arrow</span> Open</button>
+                  <button onclick="launchModule('prostate-parpi')" class="featured-launch-action" type="button"><span class="material-symbols-outlined">play_arrow</span><span>Open</span></button>
                 </div>
               </div>
             </div>
