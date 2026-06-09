@@ -1644,17 +1644,10 @@ function renderModules(options={}){
         <div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${areas}</span></div>
         <div class="marketing-card__badges"><span class="marketing-status-pill">${status}</span><span class="marketing-format-pill">${formatAsBadge(m.format)}</span></div>
       </div>
-      <div class="module-preview marketing-card__preview" aria-label="${m.title} module preview">
-        <div class="preview-window">
-          <div class="preview-window__bar"><span></span><span></span><span></span></div>
-          <div class="preview-window__body">
-            <span class="preview-window__eyebrow">${previewArea}</span>
-            <div class="preview-window__title">${m.short || m.title}</div>
-            <div class="preview-window__line" style="width:78%"></div>
-            <div class="preview-window__line" style="width:58%"></div>
-            <div class="preview-window__tiles"><span></span><span></span><span></span></div>
-          </div>
-        </div>
+      <div class="module-preview marketing-card__preview active-preview live-preview" aria-label="${m.title} live module preview">
+        <iframe class="module-live-frame" title="${m.title} live preview" loading="lazy" src="${m.url}" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="live-preview-fallback">Live preview could not render inside this card.<br/>Use Launch Experience or Open in New Tab.</div>
+        <div class="live-preview-badge"><span class="material-symbols-outlined">sensors</span> Live View</div>
         <div class="preview-caption"><span class="preview-title">${m.short || m.title}</span><span class="preview-subtitle">${m.format} • ${previewArea}</span></div>
       </div>
       <div class="marketing-card__body">
@@ -1673,6 +1666,7 @@ function renderModules(options={}){
       </div>
     </article>`;
   }).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2">No modules match your search.</div>`;
+  attachLivePreviewFallbacks();
   if(preserveScroll){
     restoreScrollPosition(previousScrollX, previousScrollY, activeElementId);
     requestAnimationFrame(()=>restoreScrollPosition(previousScrollX, previousScrollY, activeElementId));
