@@ -544,24 +544,22 @@
       <div class="text-white text-3xl sm:text-5xl font-black tracking-tight uppercase">Real World <span class="text-skyBrand">CE</span></div>
       <div class="mt-2 text-blue-100/75 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em]">Module Portal</div>
       <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80">
-        <span class="material-symbols-outlined text-[16px]">verified_user</span> Demo Access
+        <span class="material-symbols-outlined text-[16px]">verified_user</span> Secure Access
       </div>
       <form autocomplete="off" class="mt-7 space-y-4 text-left" id="portalLoginForm" onsubmit="event.preventDefault(); portalLogin();">
         <label class="block">
           <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Username</span>
-          <input autocomplete="username" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalUsername" placeholder="Demo" type="text" value="Demo"/>
+          <input autocomplete="username" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalUsername" placeholder="Enter your email or username" type="text" value=""/>
         </label>
         <label class="block">
           <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Password</span>
-          <input autocomplete="current-password" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalPassword" placeholder="Demo" type="password" value="Demo"/>
+          <input autocomplete="current-password" class="h-12 w-full rounded-2xl border border-white/15 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" id="portalPassword" placeholder="Enter your password" type="password" value=""/>
         </label>
         <div class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700" id="portalLoginError">Please enter valid portal credentials.</div>
         <button class="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-black" type="submit">
           <span class="material-symbols-outlined text-[20px]">login</span> Enter Module Portal
         </button>
-        <button class="w-full rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-blue-100 hover:bg-white/15" onclick="portalQuickLogin()" type="button">Quick Demo Access</button>
       </form>
-      <div class="mt-5 text-center text-[11px] font-semibold text-blue-100/60">Demo login: Demo / Demo</div>
     </div>
   </section>
 
@@ -577,11 +575,11 @@
         <nav class="hidden lg:flex items-center gap-3 text-sm">
           <button onclick="showPublicSection('modules')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Library</button>
           <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Login</button>
-          <div class="logged-in-pill" title="Current signed-in user"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">Demo</strong></div>
+          <div class="logged-in-pill" title="Current signed-in user"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">User</strong></div>
           <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
         </nav>
         <div class="lg:hidden flex flex-wrap gap-2">
-          <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">Demo</strong></div>
+          <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">User</strong></div>
           <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-sm inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Manager</button>
           <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 bg-white/80 text-slate-600 font-bold text-sm inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
         </div>
@@ -684,20 +682,19 @@
         <div class="mx-auto mb-4 h-3 w-16 rounded-full bg-gradient-to-r from-skyBrand via-white to-skyBrand opacity-90"></div>
         <div class="text-white text-3xl sm:text-4xl font-black tracking-tight uppercase">Real World <span class="text-skyBrand">CE</span></div>
         <div class="mt-2 text-blue-100/75 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em]">Manager Portal</div>
-        <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80"><span class="material-symbols-outlined text-[16px]">verified_user</span> Protected Demo Access</div>
+        <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80"><span class="material-symbols-outlined text-[16px]">verified_user</span> Protected Access</div>
       </div>
       <label class="block mb-4">
         <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Email</span>
-        <input id="managerEmail" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" value="manager@realworldce.org" />
+        <input id="managerEmail" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" placeholder="Enter manager email" value="" />
       </label>
       <label class="block mb-4">
         <span class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-blue-100/80">Password</span>
-        <input id="managerPassword" type="password" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" value="manager123" />
+        <input id="managerPassword" type="password" class="h-12 w-full rounded-2xl border border-white/15 bg-white/95 px-4 text-base font-bold text-medicalBlue outline-none focus:border-skyBrand focus:ring-4 focus:ring-skyBrand/20" placeholder="Enter password" value="" />
       </label>
       <div id="loginError" class="hidden-view rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 mb-4">Invalid manager login.</div>
       <button onclick="managerLogin()" class="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-black"><span class="material-symbols-outlined text-[20px]">login</span>Enter Manager Portal</button>
       <button onclick="closeManagerLogin(); backToMainMenu();" class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-5 font-black text-blue-100 hover:bg-white/15"><span class="material-symbols-outlined text-[18px]">home</span>Back to Main Menu</button>
-      <div class="text-[11px] text-blue-100/60 mt-4 text-center">Demo credentials: manager@realworldce.org / manager123</div>
     </div>
   </div>
 
@@ -730,7 +727,6 @@
           <div class="flex flex-wrap gap-3">
             <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">Manager</strong></div>
             <button onclick="backToMainMenu()" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">home</span>Back to Main Menu</button>
-            <button onclick="seedDemoData(); renderAll();" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 font-bold text-sm text-slate-700">Load Demo Data</button>
             <button onclick="exportCSV()" class="btn-primary px-4 py-3 rounded-2xl font-bold text-sm flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">download</span>Export CSV</button>
           </div>
         </header>
@@ -758,12 +754,12 @@
             <div class="settings-shell glass rounded-[2rem] p-6 max-w-3xl">
               <div class="relative z-10">
                 <h2 class="text-xl font-black text-medicalBlue mb-3">Administrator Settings</h2>
-                <p class="text-slate-600 leading-7 mb-6">This front-end demo stores activity in the browser with localStorage. For a real client LMS, connect these actions to your secure backend, LMS API, or database.</p>
+                <p class="text-slate-600 leading-7 mb-6">This front end stores activity in the browser with localStorage until it is connected to your secure backend, LMS API, or database.</p>
                 <div class="grid md:grid-cols-2 gap-4">
                   <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Current administrator</div><div class="text-slate-500 text-sm active-user-label">Administrator</div></div>
-                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Storage mode</div><div id="storageMode" class="text-slate-500 text-sm">Browser localStorage demo</div></div>
+                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Storage mode</div><div id="storageMode" class="text-slate-500 text-sm">Browser localStorage</div></div>
                 </div>
-                <div class="glass-soft rounded-3xl p-5 mt-4"><div class="font-black text-medicalBlue mb-2">Supabase connection</div><div class="text-slate-500 text-sm leading-6">Paste your Supabase project URL and public anon key into the CONFIG block near the bottom of this HTML file. Run the included SQL setup file first, then create users in Supabase Auth.</div></div><div class="flex flex-wrap gap-3 mt-6"><button onclick="clearActivity()" class="px-4 py-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-bold">Clear Activity Data</button><button onclick="seedDemoData(); renderAll();" class="btn-primary px-4 py-3 rounded-2xl font-bold">Reset Demo Data</button><button onclick="refreshSupabaseActivity()" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 font-bold">Refresh Supabase Data</button></div>
+                <div class="glass-soft rounded-3xl p-5 mt-4"><div class="font-black text-medicalBlue mb-2">Supabase connection</div><div class="text-slate-500 text-sm leading-6">Paste your Supabase project URL and public anon key into the CONFIG block near the bottom of this HTML file. Run the included SQL setup file first, then create users in Supabase Auth.</div></div><div class="flex flex-wrap gap-3 mt-6"><button onclick="clearActivity()" class="px-4 py-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-bold">Clear Activity Data</button><button onclick="refreshSupabaseActivity()" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 font-bold">Refresh Supabase Data</button></div>
               </div>
             </div>
           </section>
@@ -780,7 +776,7 @@
           <div class="text-[10px] uppercase tracking-[0.18em] font-black text-blue-700">Module Viewer</div>
           <div class="truncate text-sm sm:text-base font-black text-medicalBlue" id="moduleViewerTitle">Real World CE Module</div>
         </div>
-        <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">Demo</strong></div>
+        <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">User</strong></div>
         <a id="moduleNewTabLink" class="btn-primary inline-flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black" href="#" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined text-[18px]">open_in_new</span>Open in New Tab</a>
       </div>
     </div>
@@ -1132,7 +1128,7 @@ function setActivity(data){
 }
 function setStorageModeLabel(){
   const node=document.getElementById('storageMode');
-  if(node) node.textContent = rwceSupabaseReady ? 'Supabase PostgreSQL connected' : 'Browser localStorage demo';
+  if(node) node.textContent = rwceSupabaseReady ? 'Supabase PostgreSQL connected' : 'Browser localStorage';
 }
 async function getSupabaseProfile(user){
   if(!rwceSupabase || !user) return null;
@@ -1320,8 +1316,6 @@ function enforceAdminOnlySettings(){
   const allowAdminSettings = isAdminUser();
   const settingsTab = document.querySelector('[data-tab="settings"]');
   const settingsView = document.getElementById('admin-settings');
-  const settingsWasActive = !!(settingsTab && settingsTab.classList.contains('tab-active'));
-  const settingsWasVisible = !!(settingsView && !settingsView.classList.contains('hidden-view'));
   if(settingsTab){
     settingsTab.classList.toggle('hidden-view', !allowAdminSettings);
     settingsTab.style.display = allowAdminSettings ? '' : 'none';
@@ -1333,16 +1327,13 @@ function enforceAdminOnlySettings(){
     settingsView.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
     if(!allowAdminSettings){
       settingsView.classList.add('hidden-view');
-      if(settingsWasActive || settingsWasVisible){
-        document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
-        const dashboard = document.getElementById('admin-dashboard');
-        if(dashboard) dashboard.classList.remove('hidden-view');
-        document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
-        const dashboardTab = document.querySelector('[data-tab="dashboard"]');
-        if(dashboardTab) dashboardTab.classList.add('tab-active');
-        const title = document.getElementById('adminTitle');
-        if(title) title.textContent = 'System Overview';
-      }
+      const dashboard = document.getElementById('admin-dashboard');
+      if(dashboard) dashboard.classList.remove('hidden-view');
+      document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
+      const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+      if(dashboardTab) dashboardTab.classList.add('tab-active');
+      const title = document.getElementById('adminTitle');
+      if(title) title.textContent = 'System Overview';
     }
   }
 }
@@ -1350,10 +1341,7 @@ function updateManagerVisibility(){
   const showManager = isManagerUser();
   const showAdmin = isAdminUser();
   document.querySelectorAll('.manager-only').forEach(node=>node.classList.toggle('hidden-view', !showManager));
-  document.querySelectorAll('.admin-only').forEach(node=>{
-    if(showAdmin && node.classList.contains('admin-view')) return; // admin-only views are shown only by tab selection
-    node.classList.toggle('hidden-view', !showAdmin);
-  });
+  document.querySelectorAll('.admin-only').forEach(node=>node.classList.toggle('hidden-view', !showAdmin));
   const accessLabel=document.getElementById('accessLevelLabel');
   if(accessLabel) accessLabel.textContent = showAdmin ? 'Administrator' : (showManager ? 'Manager' : 'Learner');
   updateActiveUserDisplay();
@@ -1383,31 +1371,7 @@ async function portalLogin(){
     if(error){ error.textContent = result.error || 'Supabase login failed.'; error.classList.remove('hidden-view'); }
     return;
   }
-  if(u.toLowerCase()==='demo' && p.toLowerCase()==='demo'){
-    localStorage.setItem('rwcePortalAuthed','true');
-    localStorage.setItem('rwceUserRole','learner');
-    localStorage.setItem('rwceActiveUser',u||'Demo');
-    if(error) error.classList.add('hidden-view');
-    backToMainMenu();
-    return;
-  }
-  if(u.toLowerCase()==='manager@realworldce.org' && p==='manager123'){
-    localStorage.setItem('rwcePortalAuthed','true');
-    localStorage.setItem('rwceManagerAuthed','true');
-    localStorage.setItem('rwceUserRole','manager');
-    localStorage.setItem('rwceActiveUser','Manager');
-    if(error) error.classList.add('hidden-view');
-    enterAdminPortal();
-    return;
-  }
   if(error) error.classList.remove('hidden-view');
-}
-function portalQuickLogin(){
-  const u=document.getElementById('portalUsername');
-  const p=document.getElementById('portalPassword');
-  if(u) u.value='Demo';
-  if(p) p.value='Demo';
-  portalLogin();
 }
 function backToMainMenu(){
   localStorage.setItem('rwcePortalAuthed','true');
@@ -1541,15 +1505,7 @@ async function managerLogin(){
     if(err){ err.textContent = result.ok ? 'This user is not a manager.' : (result.error || 'Invalid manager login.'); err.classList.remove('hidden-view'); }
     return;
   }
-  if(email==='manager@realworldce.org' && pass==='manager123'){
-    localStorage.setItem('rwcePortalAuthed','true');
-    localStorage.setItem('rwceManagerAuthed','true');
-    localStorage.setItem('rwceUserRole','manager');
-    localStorage.setItem('rwceActiveUser','Manager');
-    const err=document.getElementById('loginError'); if(err) err.classList.add('hidden-view');
-    enterAdminPortal();
-  }
-  else document.getElementById('loginError').classList.remove('hidden-view');
+  document.getElementById('loginError').classList.remove('hidden-view');
 }
 async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwcePortalAuthed'); localStorage.removeItem('rwceManagerAuthed'); localStorage.removeItem('rwceActiveUser'); localStorage.removeItem('rwceUserRole'); updateManagerVisibility(); showOnly('portalLogin'); forcePortalTop(); }
 function showPublicSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
