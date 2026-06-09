@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Real World CE | Module Site + Manager Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -530,9 +530,64 @@
       overflow-wrap: anywhere;
     }
 
+
+    /* =========================================================
+       Index 57 visual alignment for the secured manager build
+       ========================================================= */
+    #splash.hidden-splash { opacity: 0; pointer-events: none; }
+    .header-account-actions { display:flex; align-items:center; justify-content:flex-end; gap:.7rem; min-width:0; flex-wrap:wrap; }
+    .user-status-badge { display:inline-flex; align-items:center; gap:.45rem; padding:.55rem .85rem; border-radius:999px; background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(239,246,255,.88)); border:1px solid rgba(147,197,253,.50); color:#0f2f54; font-size:.74rem; font-weight:900; line-height:1; white-space:nowrap; box-shadow:0 14px 34px rgba(37,99,235,.12); }
+    .user-status-badge .material-symbols-outlined { font-size:17px; }
+    .rwce-logout-button { display:inline-flex; align-items:center; justify-content:center; gap:.45rem; min-height:2.55rem; padding:.58rem .9rem; border-radius:999px; border:1px solid rgba(203,213,225,.9); background:rgba(255,255,255,.92); color:#334155; font-size:.78rem; font-weight:950; line-height:1; white-space:nowrap; box-shadow:0 10px 22px rgba(15,23,42,.06); }
+    .rwce-logout-button:hover, .rwce-logout-button:focus-visible { border-color:rgba(37,99,235,.45); color:#1d4ed8; background:#ffffff; outline:none; box-shadow:0 14px 30px rgba(37,99,235,.12); }
+    .rwce-logout-button .material-symbols-outlined { font-size:17px; }
+    .mobile-chip-row { scrollbar-width:none; -ms-overflow-style:none; }
+    .mobile-chip-row::-webkit-scrollbar { display:none; }
+    .featured-kicker { display:inline-flex; align-items:center; width:fit-content; border-radius:999px; background:rgba(37,99,235,.08); border:1px solid rgba(147,197,253,.36); padding:.32rem .55rem; }
+    .featured-reason { max-width:28rem; }
+    .tracked-link, .view-pill, .view-badge { max-width:100%; overflow-wrap:anywhere; word-break:normal; }
+    #modules .command-center-card { border-radius:1.55rem !important; padding:1.35rem 1.55rem 1.55rem !important; }
+    #modules .command-center-top { display:grid !important; grid-template-columns:minmax(15rem,19rem) minmax(0,1fr) !important; gap:1.5rem !important; align-items:start !important; }
+    #modules .command-center-copy h2 { line-height:1.06 !important; letter-spacing:-.055em !important; }
+    #modules .command-center-copy p { max-width:18rem !important; line-height:1.45 !important; font-weight:500 !important; }
+    #modules .command-center-chip-row { width:100% !important; margin-top:.2rem !important; overflow:visible !important; padding-bottom:0 !important; }
+    #modules .command-center-chip-row > div, #topicChips { display:flex !important; flex-wrap:wrap !important; justify-content:flex-start !important; align-items:center !important; gap:.55rem !important; width:100% !important; }
+    #modules .command-center-chip-row .chip, #topicChips .chip { flex:0 0 auto !important; width:auto !important; min-width:0 !important; max-width:none !important; min-height:2.45rem !important; padding:.55rem .95rem !important; border-radius:999px !important; white-space:nowrap !important; text-align:center !important; line-height:1 !important; font-size:.84rem !important; font-weight:850 !important; overflow:visible !important; box-shadow:none !important; }
+    #modules .command-center-chip-row .chip.active, #topicChips .chip.active { box-shadow:0 14px 32px rgba(37,99,235,.24) !important; }
+    #modules .command-center-search-row { display:grid !important; grid-template-columns:minmax(0,1fr) 13.5rem !important; gap:.75rem !important; align-items:center !important; }
+    #modules .command-center-search, #modules .command-center-select { min-width:0 !important; box-shadow:0 12px 26px rgba(15,23,42,.04) !important; }
+    #modules .command-center-select { appearance:auto !important; cursor:pointer !important; }
+    .marketing-card { padding:1rem !important; }
+    .marketing-card__preview { margin-top:0 !important; border-radius:1.35rem; aspect-ratio:16 / 9.5; }
+    .module-description { min-height:4.65rem; }
+    #collections .quick-launch-panel { border-radius:1.35rem; border:1px solid rgba(226,232,240,.92); background:rgba(255,255,255,.92); padding:1rem; box-shadow:inset 0 1px 0 rgba(255,255,255,.74); }
+    #collections .quick-launch-panel__header { display:flex; align-items:flex-start; justify-content:space-between; gap:.8rem; flex-wrap:wrap; }
+    #collections .quick-launch-pin { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:rgba(245,243,255,.92); border:1px solid rgba(196,181,253,.55); color:#6d28d9; padding:.42rem .72rem; font-size:.68rem; font-weight:950; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+    #collections .quick-launch-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:.65rem; margin-top:.95rem; }
+    #collections .quick-launch-item { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:start; gap:.65rem .75rem; width:100%; min-width:0; min-height:4.1rem; border-radius:1rem; border:1px solid rgba(226,232,240,.95); background:linear-gradient(145deg, rgba(255,255,255,.98), rgba(248,250,252,.94)); padding:.75rem; color:#334155; text-decoration:none; text-align:left; box-shadow:0 10px 22px rgba(15,23,42,.045); overflow:hidden; }
+    #collections .quick-launch-item:hover { border-color:rgba(96,165,250,.58); color:#1d4ed8; box-shadow:0 14px 28px rgba(37,99,235,.10); transform:translateY(-1px); }
+    #collections .quick-launch-icon { grid-row:1 / span 2; display:inline-flex; align-items:center; justify-content:center; width:2.15rem; height:2.15rem; border-radius:.85rem; background:rgba(239,246,255,.96); border:1px solid rgba(147,197,253,.50); color:#2563eb; flex:0 0 auto; font-size:18px !important; }
+    #collections .quick-launch-copy { display:flex; flex-direction:column; min-width:0; gap:.24rem; }
+    #collections .quick-launch-title { color:#0f2438; font-size:.9rem; font-weight:950; line-height:1.18; overflow-wrap:anywhere; word-break:normal; }
+    #collections .quick-launch-format { color:#64748b; font-size:.62rem; font-weight:950; letter-spacing:.11em; line-height:1.05; text-transform:uppercase; overflow-wrap:anywhere; }
+    @media (max-width:1023px) { .header-account-actions { justify-content:space-between; width:100%; } }
+    @media (max-width:980px) { #modules .command-center-top { grid-template-columns:1fr !important; gap:1rem !important; } #modules .command-center-copy p { max-width:100% !important; } }
+    @media (max-width:700px) { #modules .command-center-card { padding:1rem !important; } #modules .command-center-search-row { grid-template-columns:1fr !important; } #modules .command-center-select { width:100% !important; } #modules .command-center-chip-row { overflow-x:auto !important; overflow-y:hidden !important; padding-bottom:.3rem !important; } #topicChips { flex-wrap:nowrap !important; width:max-content !important; min-width:100% !important; } #topicChips .chip { min-height:2.4rem !important; padding:.52rem .85rem !important; font-size:.78rem !important; } .module-description { min-height:0; } }
+    @media (max-width:480px) { .header-account-actions { align-items:stretch; flex-direction:column; } .rwce-logout-button, .user-status-badge { width:100%; justify-content:center; border-radius:1rem; white-space:normal; text-align:center; } .marketing-card__top { flex-direction:column; } .marketing-card__badges { justify-content:flex-start; } .marketing-card__preview { aspect-ratio:16 / 10.5; } }
+
   </style>
 </head>
-<body>
+<body class="text-slate-800 min-h-screen">
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-[#07111d] transition-opacity duration-700" id="splash">
+    <div class="px-6">
+      <div class="rounded-[32px] border border-white/10 bg-white/5 px-8 py-7 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.35)] text-center">
+        <div class="mx-auto mb-4 h-3 w-16 rounded-full bg-gradient-to-r from-skyBrand via-white to-skyBrand opacity-90 animate-pulse"></div>
+        <div class="text-white text-3xl sm:text-5xl font-black tracking-tight uppercase">Real World <span class="text-skyBrand">CE</span></div>
+        <div class="mt-2 text-blue-100/80 text-xs sm:text-sm font-semibold uppercase tracking-[0.28em]">Clinical Platform</div>
+      </div>
+    </div>
+  </div>
+
   <section id="portalLogin" class="flex items-center justify-center px-4 py-10">
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
@@ -564,44 +619,156 @@
   </section>
 
   <div id="publicSite" class="hidden-view min-h-screen">
-    <header class="site-header sticky top-0 z-40">
+    <header class="site-header sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex items-center min-w-0">
-          <div class="min-w-0">
-            <div class="font-black tracking-tight text-lg sm:text-xl text-medicalBlue uppercase leading-none">Real World <span class="text-blue-600">CE</span></div>
-            <div class="text-[11px] sm:text-sm text-slate-500 font-medium mt-1">Clinical learning portal</div>
-          </div>
+        <div class="min-w-0">
+          <div class="font-black tracking-tight text-lg sm:text-xl text-medicalBlue uppercase leading-none">Real World <span class="text-blue-600">CE</span></div>
+          <div class="text-[11px] sm:text-sm text-slate-500 font-medium mt-1">Clinical learning portal</div>
         </div>
+
         <nav class="hidden lg:flex items-center gap-3 text-sm">
           <button onclick="showPublicSection('modules')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Library</button>
-          <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Login</button>
-          <div class="logged-in-pill" title="Current signed-in user"><span class="material-symbols-outlined">account_circle</span><span>Logged in:</span><strong class="active-user-label">User</strong></div>
-          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
+          <button onclick="showPublicSection('featuredExperiences')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Featured</button>
+          <button onclick="showPublicSection('collections')" class="px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-semibold hover:border-blue-300 hover:text-blue-700 transition">Collections</button>
+          <button onclick="showPublicSection('modules')" class="px-4 py-2 rounded-full bg-blue-600 text-white font-semibold shadow-glow">Launch Center</button>
+          <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Manager Portal</button>
         </nav>
-        <div class="lg:hidden flex flex-wrap gap-2">
-          <div class="logged-in-pill"><span class="material-symbols-outlined">account_circle</span><strong class="active-user-label">User</strong></div>
-          <button onclick="openManagerLogin()" class="manager-only hidden-view btn-primary px-4 py-2 rounded-full font-black text-sm inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Manager</button>
-          <button onclick="logoutToLogin()" class="px-4 py-2 rounded-full border border-slate-200 bg-white/80 text-slate-600 font-bold text-sm inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">logout</span> Logout</button>
+
+        <div class="header-account-actions">
+          <div aria-label="Logged in user" class="user-status-badge">
+            <span aria-hidden="true" class="material-symbols-outlined">account_circle</span>
+            <span>Logged in: <strong class="active-user-label">User</strong></span>
+          </div>
+          <button onclick="logoutToLogin()" aria-label="Log out of the portal" class="rwce-logout-button" type="button">
+            <span aria-hidden="true" class="material-symbols-outlined">logout</span>
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <div class="mobile-chip-row lg:hidden -mx-1 overflow-x-auto">
+          <div class="flex w-max gap-2 px-1 pb-1">
+            <button onclick="showPublicSection('modules')" class="px-3 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-semibold whitespace-nowrap">Library</button>
+            <button onclick="showPublicSection('featuredExperiences')" class="px-3 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-semibold whitespace-nowrap">Featured</button>
+            <button onclick="showPublicSection('collections')" class="px-3 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-semibold whitespace-nowrap">Collections</button>
+            <button onclick="openManagerLogin()" class="manager-only hidden-view px-3 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold whitespace-nowrap shadow-glow">Manager</button>
+          </div>
         </div>
       </div>
     </header>
 
-    <section class="hero-bg">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-        <div class="grid lg:grid-cols-[1.28fr_.72fr] gap-8 items-center">
+    <section class="hero-bg text-white relative overflow-hidden">
+      <div class="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_20%_20%,white_0,transparent_28%),radial-gradient(circle_at_80%_10%,white_0,transparent_22%),radial-gradient(circle_at_75%_75%,white_0,transparent_20%)]"></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 relative z-10">
+        <div class="grid lg:grid-cols-[1.4fr_.9fr] gap-8 items-center">
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-5">
               <span class="px-3 py-1 rounded-full bg-white/12 border border-white/15 text-[11px] font-black uppercase tracking-[0.18em]">Launch Library</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/90 text-[11px] font-black uppercase tracking-[0.18em]">14 Linked Projects</span>
               <span class="manager-only hidden-view px-3 py-1 rounded-full bg-emerald-500/90 text-[11px] font-black uppercase tracking-[0.18em]">Manager Reporting</span>
             </div>
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.02] max-w-4xl">Bringing the <span class="text-skyBrand">Real World</span> Into Clinical Education.</h1>
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.02] max-w-4xl">Bringing the <span class="text-skyBrand">Real World</span> Into CE.</h1>
             <p class="mt-5 text-blue-100/85 text-lg leading-8 max-w-2xl">A clinical education platform built to connect real patient decisions, real practice challenges, and real-world learning.</p>
             <div class="mt-8 flex flex-col sm:flex-row gap-3">
-              <button onclick="document.getElementById('moduleGrid').scrollIntoView({behavior:'smooth'})" class="btn-light inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl font-bold"><span class="material-symbols-outlined text-[20px]">apps</span> Browse Modules</button>
-              <button onclick="openManagerLogin()" class="manager-only hidden-view inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl border border-white/20 bg-white/10 font-bold hover:bg-white/15 transition"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Manager Portal</button>
+              <button onclick="showPublicSection('modules')" class="btn-light inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl font-bold"><span class="material-symbols-outlined text-[20px]">apps</span> Browse All Links</button>
+              <button onclick="showPublicSection('collections')" class="inline-flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 rounded-xl border border-white/20 bg-white/10 font-bold hover:bg-white/15 transition"><span class="material-symbols-outlined text-[20px]">folder_open</span> View Collections</button>
             </div>
           </div>
-          <div class="glass rounded-3xl p-6 shadow-soft text-slate-900">
+
+          <div class="glass rounded-3xl p-6 shadow-soft text-slate-900" id="featuredExperiences">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <div class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Featured Experiences</div>
+                <div class="text-2xl font-black tracking-tight text-medicalBlue mt-1">Featured launch priorities</div>
+              </div>
+              <span class="material-symbols-outlined text-blue-500 text-[30px]">rocket_launch</span>
+            </div>
+            <div class="space-y-4">
+              <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <div class="font-bold text-slate-800">Tardive Dyskinesia</div>
+                    <div class="featured-kicker mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700">High-impact psychiatry module</div>
+                    <p class="featured-reason mt-1 text-xs leading-relaxed text-slate-500 font-semibold">Featured for clinical impact: recognition, functional burden, assessment, and treatment follow-up in one focused experience.</p>
+                  </div>
+                  <button onclick="launchModule('td-module')" class="inline-flex w-full sm:w-auto justify-center items-center gap-1 px-3 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition tracked-link"><span class="material-symbols-outlined text-[16px]">play_arrow</span> Open</button>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <div class="font-bold text-slate-800">Prostate Cancer PARP Inhibitor Therapy</div>
+                    <div class="featured-kicker mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700">Priority hematology/oncology update</div>
+                    <p class="featured-reason mt-1 text-xs leading-relaxed text-slate-500 font-semibold">Featured for workflow relevance: HRR testing, PARP inhibitor sequencing, shared decisions, and MDT adverse-event management.</p>
+                  </div>
+                  <button onclick="launchModule('prostate-parpi')" class="inline-flex w-full sm:w-auto justify-center items-center gap-1 px-3 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition tracked-link"><span class="material-symbols-outlined text-[16px]">play_arrow</span> Open</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+      <section class="grid xl:grid-cols-[1.3fr_.7fr] gap-6 sm:gap-8">
+        <div class="space-y-6" id="modules">
+          <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft command-center-card">
+            <div class="command-center-top">
+              <div class="command-center-copy">
+                <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Module Library</div>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Module command<br class="hidden lg:block"/> center</h2>
+                <p class="text-slate-500 mt-2">Search, launch, and track every live clinical module from the command center.</p>
+              </div>
+              <div id="topicChips" class="filter-chip-row command-center-chip-row pb-1" aria-label="Module filter tabs"></div>
+            </div>
+            <div class="command-center-search-row mt-5">
+              <label class="relative block command-center-search">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">search</span>
+                <input id="moduleSearch" oninput="renderModules({preserveScroll:true})" class="w-full h-12 rounded-2xl border border-slate-200 bg-white pl-12 pr-4 text-sm font-medium outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50" placeholder="Search by module, specialty, topic, or format..." type="text" />
+              </label>
+              <select id="topicFilter" onchange="syncTopicChips(); renderModules({preserveScroll:true})" aria-label="Module view filter" class="command-center-select h-12 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-black text-medicalBlue outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"></select>
+            </div>
+          </div>
+
+          <div id="moduleGrid" class="grid sm:grid-cols-2 gap-5"></div>
+        </div>
+
+        <aside id="collections" class="space-y-6">
+          <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft quick-launch-panel">
+            <div class="quick-launch-panel__header">
+              <div>
+                <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Collections</div>
+                <h2 class="text-2xl font-black tracking-tight text-medicalBlue mt-1">Quick launch groups</h2>
+                <p class="text-slate-500 mt-2 text-sm leading-6">Jump into priority clinical areas and learning formats.</p>
+              </div>
+              <span class="quick-launch-pin">Pinned</span>
+            </div>
+
+            <div class="quick-launch-grid">
+              <button onclick="setTopicFilter('Hematology/Oncology'); showPublicSection('modules')" class="quick-launch-item">
+                <span class="material-symbols-outlined quick-launch-icon">genetics</span>
+                <span class="quick-launch-copy"><span class="quick-launch-title">Hematology/Oncology</span><span class="quick-launch-format">Clinical collection</span></span>
+              </button>
+              <button onclick="setTopicFilter('Immunology'); showPublicSection('modules')" class="quick-launch-item">
+                <span class="material-symbols-outlined quick-launch-icon">immunology</span>
+                <span class="quick-launch-copy"><span class="quick-launch-title">Immunology</span><span class="quick-launch-format">Clinical collection</span></span>
+              </button>
+              <button onclick="setTopicFilter('Rare Disease'); showPublicSection('modules')" class="quick-launch-item">
+                <span class="material-symbols-outlined quick-launch-icon">neurology</span>
+                <span class="quick-launch-copy"><span class="quick-launch-title">Rare Disease</span><span class="quick-launch-format">Clinical collection</span></span>
+              </button>
+              <button onclick="setTopicFilter('Patients'); showPublicSection('modules')" class="quick-launch-item">
+                <span class="material-symbols-outlined quick-launch-icon">clinical_notes</span>
+                <span class="quick-launch-copy"><span class="quick-launch-title">Real World Patient</span><span class="quick-launch-format">Learning format</span></span>
+              </button>
+              <button onclick="setTopicFilter('Data'); showPublicSection('modules')" class="quick-launch-item">
+                <span class="material-symbols-outlined quick-launch-icon">database</span>
+                <span class="quick-launch-copy"><span class="quick-launch-title">Real World Data</span><span class="quick-launch-format">Learning format</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft">
             <div class="flex items-center justify-between mb-5">
               <div>
                 <div class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Live Overview</div>
@@ -616,62 +783,8 @@
               <div class="stat-card rounded-3xl p-5"><div class="text-xs text-slate-500 uppercase font-black tracking-widest relative z-10">Modules</div><div id="heroModules" class="text-4xl font-black mt-3 text-medicalBlue relative z-10">0</div></div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
-      <section id="featuredExperiences" class="mb-8">
-        <div class="glass rounded-[2rem] p-5 sm:p-6 shadow-soft">
-          <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
-            <div>
-              <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Featured Experiences</div>
-              <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Featured Modules</h2>
-              <p class="text-slate-500 mt-1">Browse modules by the Real World CE experience type.</p>
-            </div>
-            <button onclick="setTopicFilter('All')" class="main-menu-btn"><span class="material-symbols-outlined text-[18px]">apps</span>View All Modules</button>
-          </div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <button onclick="setTopicFilter('Simulations'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
-              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">play_circle</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Sim</div><div class="mt-1 text-sm text-slate-500 leading-6">Interactive simulation modules.</div></div>
-            </button>
-            <button onclick="setTopicFilter('Patients'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
-              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">clinical_notes</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Patient</div><div class="mt-1 text-sm text-slate-500 leading-6">Patient-centered learning modules.</div></div>
-            </button>
-            <button onclick="setTopicFilter('Data'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
-              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">database</span><div class="mt-3 text-lg font-black text-medicalBlue">Real World Data</div><div class="mt-1 text-sm text-slate-500 leading-6">Data-driven clinical education.</div></div>
-            </button>
-            <button onclick="setTopicFilter('Assessments'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
-              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">quiz</span><div class="mt-3 text-lg font-black text-medicalBlue">Real Quiz</div><div class="mt-1 text-sm text-slate-500 leading-6">Assessment-based activities.</div></div>
-            </button>
-            <button onclick="setTopicFilter('Cases'); document.getElementById('modules').scrollIntoView({behavior:'smooth'});" class="track-card rounded-3xl p-5 text-left hover:cursor-pointer">
-              <div class="relative z-10"><span class="material-symbols-outlined text-blue-600 text-[28px]">assignment</span><div class="mt-3 text-lg font-black text-medicalBlue">Real Case</div><div class="mt-1 text-sm text-slate-500 leading-6">Case-based learning modules.</div></div>
-            </button>
-          </div>
-        </div>
+        </aside>
       </section>
-
-      <section id="modules" class="space-y-6 mb-12">
-        <div class="glass rounded-3xl p-5 sm:p-6 shadow-soft">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Module Library</div>
-              <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-medicalBlue mt-1">Module command center</h2>
-              <p class="text-slate-500 mt-1">Search, launch, and track every live clinical module from the command center.</p>
-            </div>
-            <div id="topicChips" class="flex flex-wrap gap-2" aria-label="Module filter tabs"></div>
-          </div>
-          <div class="mt-5 grid md:grid-cols-[1fr_auto] gap-3">
-            <label class="relative block">
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-              <input id="moduleSearch" oninput="renderModules({preserveScroll:true})" class="glass-soft w-full h-12 rounded-2xl pl-12 pr-4 text-sm font-medium focus:border-blue-400 focus:ring-4 focus:ring-blue-50" placeholder="Search by module, specialty, topic, or format..." type="text" />
-            </label>
-            <select id="topicFilter" onchange="syncTopicChips(); renderModules({preserveScroll:true})" class="glass-soft h-12 w-full md:w-auto rounded-2xl px-4 md:px-5 text-sm font-bold"></select>
-          </div>
-        </div>
-        <div id="moduleGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
-      </section>
-
     </main>
   </div>
 
@@ -1450,17 +1563,51 @@ function renderModules(options={}){
   const q=(document.getElementById('moduleSearch')?.value||'').toLowerCase();
   const topic=document.getElementById('topicFilter')?.value||'All';
   const filtered=modules.filter(m=>moduleMatchesFilter(m, topic) && moduleSearchText(m).includes(q));
-  grid.innerHTML = filtered.length ? filtered.map(m=>`<article class="module-card glass marketing-card p-4 sm:p-5" data-area="${m.topic}" data-format="${m.formatGroup}">
-    <div class="marketing-card__top"><div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${m.topic}</span></div><div class="marketing-card__badges"><span class="marketing-status-pill">Live</span><span class="marketing-format-pill">${m.format}</span></div></div>
-    <div class="module-preview active-preview live-preview" aria-label="${m.title} live module preview">
-      <iframe class="module-live-frame" title="${m.title} live preview" loading="lazy" src="${m.url}" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div class="live-preview-fallback">Live preview could not render inside this card.<br/>Use Launch Module or Open in New Tab.</div>
-      <div class="live-preview-badge"><span class="material-symbols-outlined">sensors</span> Live View</div>
-      <div class="preview-caption"><span class="preview-title">${m.short}</span><span class="preview-subtitle">${m.format} • ${m.topic}</span></div>
-    </div>
-    <div class="marketing-card__body"><div class="marketing-card__eyebrow">${m.format} Learning Experience</div><h3 class="marketing-card__title">${m.title}</h3><p class="marketing-card__description">${m.description}</p><div aria-label="Module details" class="marketing-card__metadata"><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Clinical Area</span><strong>${m.topic}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Format</span><strong>${m.format}</strong></div><div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div></div><div class="marketing-card__footer"><button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Module</button><button onclick="simulateCompletion('${m.id}')" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 text-sm font-bold">Demo Complete</button></div></div>
-  </article>`).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2 xl:col-span-3">No modules match your search.</div>`;
-  attachLivePreviewFallbacks();
+  const formatAsBadge = value => String(value || '').replace(/^Real World\s+/i, 'Real World<br>');
+  const displayAreas = m => {
+    const nonClinical = ['Patients','Simulations','Data','Assessments','Cases'];
+    const areas = (m.categories || [m.topic]).filter(c => !nonClinical.includes(c));
+    return (areas.length ? areas : [m.topic]).join(' / ');
+  };
+  const cardStatus = m => ['prostate-parpi','td-module'].includes(m.id) ? 'Featured' : ['narcolepsy-type1','pid'].includes(m.id) ? 'New' : 'Live';
+  grid.innerHTML = filtered.length ? filtered.map(m=>{
+    const areas = displayAreas(m);
+    const status = cardStatus(m);
+    const previewArea = (areas.split(' / ')[0] || m.topic);
+    return `<article class="module-card glass rounded-3xl shadow-soft border border-slate-200 marketing-card" data-area="${areas}" data-format="${m.formatGroup}">
+      <div class="marketing-card__top">
+        <div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${areas}</span></div>
+        <div class="marketing-card__badges"><span class="marketing-status-pill">${status}</span><span class="marketing-format-pill">${formatAsBadge(m.format)}</span></div>
+      </div>
+      <div class="module-preview marketing-card__preview" aria-label="${m.title} module preview">
+        <div class="preview-window">
+          <div class="preview-window__bar"><span></span><span></span><span></span></div>
+          <div class="preview-window__body">
+            <span class="preview-window__eyebrow">${previewArea}</span>
+            <div class="preview-window__title">${m.short || m.title}</div>
+            <div class="preview-window__line" style="width:78%"></div>
+            <div class="preview-window__line" style="width:58%"></div>
+            <div class="preview-window__tiles"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="preview-caption"><span class="preview-title">${m.short || m.title}</span><span class="preview-subtitle">${m.format} • ${previewArea}</span></div>
+      </div>
+      <div class="marketing-card__body">
+        <div class="marketing-card__eyebrow">Real World CE Learning Experience</div>
+        <h3 class="marketing-card__title text-medicalBlue">${m.title}</h3>
+        <p class="module-description marketing-card__description">${m.description}</p>
+        <div aria-label="Module details" class="marketing-card__metadata">
+          <div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Clinical Area</span><strong>${areas}</strong></div>
+          <div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Format</span><strong>${formatAsBadge(m.format)}</strong></div>
+          <div class="marketing-card__meta-item"><span class="marketing-card__meta-label">Credit</span><strong>${m.credits} CME</strong></div>
+        </div>
+        <div class="marketing-card__footer">
+          <button onclick="launchModule('${m.id}')" class="marketing-launch"><span aria-hidden="true" class="material-symbols-outlined">arrow_outward</span> Launch Experience</button>
+          <span class="marketing-card__owner">Real World CE</span>
+        </div>
+      </div>
+    </article>`;
+  }).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2">No modules match your search.</div>`;
   if(preserveScroll){
     restoreScrollPosition(previousScrollX, previousScrollY, activeElementId);
     requestAnimationFrame(()=>restoreScrollPosition(previousScrollX, previousScrollY, activeElementId));
@@ -1559,16 +1706,17 @@ function renderAll(){ renderModules(); renderStats(); renderRecentTable(); rende
 function seedDemoData(){
   const now=Date.now(); const data=[]; for(let i=0;i<18;i++){ const m=modules[i%modules.length]; const l=demoLearners[i%demoLearners.length]; const completed=i%4!==0; data.push({id:cryptoId(), learner:l.name, email:l.email, org:l.org, moduleId:m.id, module:m.title, topic:m.topic, progress:completed?100:35+((i*7)%45), time:18+((i*9)%68), credits:completed?m.credits:0, status:completed?'Completed':'In Progress', date:new Date(now - i*86400000/1.7).toISOString()}); } setActivity(data);
 }
-function clearActivity(){ if(confirm('Clear all local demo activity records?')){ setActivity([]); renderAll(); } }
+function clearActivity(){ if(confirm('Clear all local activity records?')){ setActivity([]); renderAll(); } }
 function exportCSV(){
   const data=getActivity(); const headers=['Learner','Email','Organization','Module','Topic','Progress','Time Minutes','Credits','Status','Date'];
   const csv=[headers.join(','), ...data.map(x=>[x.learner,x.email,x.org,x.module,x.topic,x.progress,x.time,x.credits,x.status,fmtDate(x.date)].map(v=>`"${String(v).replaceAll('"','""')}"`).join(','))].join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='realworldce-manager-report.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 window.addEventListener('DOMContentLoaded', async ()=>{
+  setTimeout(()=>document.getElementById('splash')?.classList.add('hidden-splash'), 450);
+  setTimeout(()=>document.getElementById('splash')?.remove(), 1200);
   initSupabase();
   setStorageModeLabel();
-  if(!getActivity().length && !isSupabaseConfigured()) seedDemoData();
   // Always begin at the login page on a fresh page load.
   // This prevents previously stored localStorage or Supabase sessions from bypassing login.
   await supabaseSignOut();
