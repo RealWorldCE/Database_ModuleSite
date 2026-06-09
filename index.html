@@ -1316,24 +1316,34 @@ function enforceAdminOnlySettings(){
   const allowAdminSettings = isAdminUser();
   const settingsTab = document.querySelector('[data-tab="settings"]');
   const settingsView = document.getElementById('admin-settings');
+
   if(settingsTab){
     settingsTab.classList.toggle('hidden-view', !allowAdminSettings);
     settingsTab.style.display = allowAdminSettings ? '' : 'none';
     settingsTab.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
     settingsTab.disabled = !allowAdminSettings;
   }
+
   if(settingsView){
     settingsView.style.display = allowAdminSettings ? '' : 'none';
     settingsView.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
+
     if(!allowAdminSettings){
+      const wasTryingToOpenSettings = !settingsView.classList.contains('hidden-view') || settingsTab?.classList.contains('tab-active');
       settingsView.classList.add('hidden-view');
-      const dashboard = document.getElementById('admin-dashboard');
-      if(dashboard) dashboard.classList.remove('hidden-view');
-      document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
-      const dashboardTab = document.querySelector('[data-tab="dashboard"]');
-      if(dashboardTab) dashboardTab.classList.add('tab-active');
-      const title = document.getElementById('adminTitle');
-      if(title) title.textContent = 'System Overview';
+
+      /* Only move the user back to Dashboard if they were actually on Settings.
+         Do not force Dashboard every time; managers still need User Reports and Module Analytics to stay visible. */
+      if(wasTryingToOpenSettings){
+        document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
+        const dashboard = document.getElementById('admin-dashboard');
+        if(dashboard) dashboard.classList.remove('hidden-view');
+        document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
+        const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+        if(dashboardTab) dashboardTab.classList.add('tab-active');
+        const title = document.getElementById('adminTitle');
+        if(title) title.textContent = 'System Overview';
+      }
     }
   }
 }
