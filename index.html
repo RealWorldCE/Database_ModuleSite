@@ -712,12 +712,12 @@
           <button data-tab="dashboard" onclick="showAdminTab('dashboard')" class="admin-tab tab-active w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">dashboard</span>Dashboard</button>
           <button data-tab="learners" onclick="showAdminTab('learners')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">group</span>User Reports</button>
           <button data-tab="analytics" onclick="showAdminTab('analytics')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">monitoring</span>Module Analytics</button>
-          <button data-tab="settings" onclick="showAdminTab('settings')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">settings</span>Settings</button>
+          <button data-tab="settings" onclick="showAdminTab('settings')" class="admin-only hidden-view admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold" aria-hidden="true" disabled style="display:none"><span class="material-symbols-outlined">settings</span>Settings</button>
         </nav>
         <div class="bottom-actions absolute bottom-4 left-4 right-4">
           <div class="glass-soft rounded-3xl p-4 mb-3">
             <div class="text-xs font-black uppercase tracking-widest text-slate-500">Access Level</div>
-            <div class="font-black text-medicalBlue mt-1">Manager Demo</div>
+            <div id="accessLevelLabel" class="font-black text-medicalBlue mt-1">Manager</div>
           </div>
           <button onclick="backToMainMenu()" class="w-full px-4 py-3 rounded-2xl bg-white/80 hover:bg-white text-slate-700 border border-slate-200 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">home</span>Back to Main Menu</button>
           <button onclick="logoutManager()" class="mt-2 w-full px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">logout</span>Manager Logout</button>
@@ -754,13 +754,13 @@
             <div id="analyticsGrid" class="grid lg:grid-cols-2 gap-5"></div>
           </section>
 
-          <section id="admin-settings" class="admin-view hidden-view">
+          <section id="admin-settings" class="admin-only admin-view hidden-view" aria-hidden="true" style="display:none">
             <div class="settings-shell glass rounded-[2rem] p-6 max-w-3xl">
               <div class="relative z-10">
-                <h2 class="text-xl font-black text-medicalBlue mb-3">Manager Settings</h2>
+                <h2 class="text-xl font-black text-medicalBlue mb-3">Administrator Settings</h2>
                 <p class="text-slate-600 leading-7 mb-6">This front-end demo stores activity in the browser with localStorage. For a real client LMS, connect these actions to your secure backend, LMS API, or database.</p>
                 <div class="grid md:grid-cols-2 gap-4">
-                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Current demo manager</div><div class="text-slate-500 text-sm">manager@realworldce.org</div></div>
+                  <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Current administrator</div><div class="text-slate-500 text-sm active-user-label">Administrator</div></div>
                   <div class="glass-soft rounded-3xl p-5"><div class="font-black text-medicalBlue mb-2">Storage mode</div><div id="storageMode" class="text-slate-500 text-sm">Browser localStorage demo</div></div>
                 </div>
                 <div class="glass-soft rounded-3xl p-5 mt-4"><div class="font-black text-medicalBlue mb-2">Supabase connection</div><div class="text-slate-500 text-sm leading-6">Paste your Supabase project URL and public anon key into the CONFIG block near the bottom of this HTML file. Run the included SQL setup file first, then create users in Supabase Auth.</div></div><div class="flex flex-wrap gap-3 mt-6"><button onclick="clearActivity()" class="px-4 py-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-bold">Clear Activity Data</button><button onclick="seedDemoData(); renderAll();" class="btn-primary px-4 py-3 rounded-2xl font-bold">Reset Demo Data</button><button onclick="refreshSupabaseActivity()" class="px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-slate-200 text-slate-700 font-bold">Refresh Supabase Data</button></div>
@@ -1101,7 +1101,7 @@ const demoLearners = [
 // SUPABASE CONFIG
 // 1) Run the included rwce_supabase_setup.sql file in Supabase SQL Editor.
 // 2) Replace the two values below with your Supabase Project URL and public anon key.
-// 3) Create users in Supabase Authentication. Set manager users to role='manager' in public.profiles.
+// 3) Create users in Supabase Authentication. Set manager users to role='manager' and administrator users to role='admin' in public.profiles.
 // Note: Keep the service_role key OUT of this HTML file. Only use the public anon key here.
 // ================================
 const RWCE_SUPABASE_URL = 'https://mfcvunvlmacwxoguznoh.supabase.co';
@@ -1146,9 +1146,12 @@ async function restoreSupabaseSession(){
   if(error || !data?.session?.user) return false;
   rwceCurrentUser = data.session.user;
   rwceProfile = await getSupabaseProfile(rwceCurrentUser);
+  const role = normalizeRole(rwceProfile?.role || 'learner');
   localStorage.setItem('rwcePortalAuthed','true');
   localStorage.setItem('rwceActiveUser', rwceProfile?.full_name || rwceCurrentUser.email || 'Learner');
-  if(rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin') localStorage.setItem('rwceManagerAuthed','true');
+  localStorage.setItem('rwceUserRole', role);
+  if(isManagerRole(role)) localStorage.setItem('rwceManagerAuthed','true');
+  else localStorage.removeItem('rwceManagerAuthed');
   await refreshSupabaseActivity(false);
   return true;
 }
@@ -1285,8 +1288,26 @@ function showOnly(viewId){
   });
   updateManagerVisibility();
 }
+function normalizeRole(role){
+  return String(role || '').trim().toLowerCase();
+}
+function getCurrentRole(){
+  return normalizeRole(rwceProfile?.role || localStorage.getItem('rwceUserRole') || 'learner');
+}
+function isAdminRole(role){
+  const normalized = normalizeRole(role);
+  return normalized === 'admin' || normalized === 'administrator';
+}
+function isManagerRole(role){
+  const normalized = normalizeRole(role);
+  return normalized === 'manager' || isAdminRole(normalized);
+}
+function isAdminUser(){
+  const role = getCurrentRole();
+  return isAdminRole(role);
+}
 function isManagerUser(){
-  return localStorage.getItem('rwceManagerAuthed') === 'true' || rwceProfile?.role === 'manager' || rwceProfile?.role === 'admin';
+  return localStorage.getItem('rwceManagerAuthed') === 'true' || isManagerRole(getCurrentRole());
 }
 function getActiveUserName(){
   return localStorage.getItem('rwceActiveUser') || rwceProfile?.full_name || rwceCurrentUser?.email || 'Demo';
@@ -1295,10 +1316,48 @@ function updateActiveUserDisplay(){
   const name=getActiveUserName();
   document.querySelectorAll('.active-user-label').forEach(node=>{ node.textContent=name; });
 }
+function enforceAdminOnlySettings(){
+  const allowAdminSettings = isAdminUser();
+  const settingsTab = document.querySelector('[data-tab="settings"]');
+  const settingsView = document.getElementById('admin-settings');
+  const settingsWasActive = !!(settingsTab && settingsTab.classList.contains('tab-active'));
+  const settingsWasVisible = !!(settingsView && !settingsView.classList.contains('hidden-view'));
+  if(settingsTab){
+    settingsTab.classList.toggle('hidden-view', !allowAdminSettings);
+    settingsTab.style.display = allowAdminSettings ? '' : 'none';
+    settingsTab.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
+    settingsTab.disabled = !allowAdminSettings;
+  }
+  if(settingsView){
+    settingsView.style.display = allowAdminSettings ? '' : 'none';
+    settingsView.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
+    if(!allowAdminSettings){
+      settingsView.classList.add('hidden-view');
+      if(settingsWasActive || settingsWasVisible){
+        document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
+        const dashboard = document.getElementById('admin-dashboard');
+        if(dashboard) dashboard.classList.remove('hidden-view');
+        document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
+        const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+        if(dashboardTab) dashboardTab.classList.add('tab-active');
+        const title = document.getElementById('adminTitle');
+        if(title) title.textContent = 'System Overview';
+      }
+    }
+  }
+}
 function updateManagerVisibility(){
-  const show=isManagerUser();
-  document.querySelectorAll('.manager-only').forEach(node=>node.classList.toggle('hidden-view', !show));
+  const showManager = isManagerUser();
+  const showAdmin = isAdminUser();
+  document.querySelectorAll('.manager-only').forEach(node=>node.classList.toggle('hidden-view', !showManager));
+  document.querySelectorAll('.admin-only').forEach(node=>{
+    if(showAdmin && node.classList.contains('admin-view')) return; // admin-only views are shown only by tab selection
+    node.classList.toggle('hidden-view', !showAdmin);
+  });
+  const accessLabel=document.getElementById('accessLevelLabel');
+  if(accessLabel) accessLabel.textContent = showAdmin ? 'Administrator' : (showManager ? 'Manager' : 'Learner');
   updateActiveUserDisplay();
+  enforceAdminOnlySettings();
 }
 async function portalLogin(){
   const u=(document.getElementById('portalUsername')?.value||'').trim();
@@ -1307,10 +1366,12 @@ async function portalLogin(){
   if(isSupabaseConfigured() && u.includes('@')){
     const result = await supabaseSignIn(u, p);
     if(result.ok){
+      const role = normalizeRole(result.profile?.role || 'learner');
       localStorage.setItem('rwcePortalAuthed','true');
       localStorage.setItem('rwceActiveUser', result.profile?.full_name || u);
+      localStorage.setItem('rwceUserRole', role);
       if(error) error.classList.add('hidden-view');
-      if(result.profile?.role === 'manager' || result.profile?.role === 'admin'){
+      if(isManagerRole(role)){
         localStorage.setItem('rwceManagerAuthed','true');
         enterAdminPortal();
       } else {
@@ -1324,6 +1385,7 @@ async function portalLogin(){
   }
   if(u.toLowerCase()==='demo' && p.toLowerCase()==='demo'){
     localStorage.setItem('rwcePortalAuthed','true');
+    localStorage.setItem('rwceUserRole','learner');
     localStorage.setItem('rwceActiveUser',u||'Demo');
     if(error) error.classList.add('hidden-view');
     backToMainMenu();
@@ -1332,6 +1394,7 @@ async function portalLogin(){
   if(u.toLowerCase()==='manager@realworldce.org' && p==='manager123'){
     localStorage.setItem('rwcePortalAuthed','true');
     localStorage.setItem('rwceManagerAuthed','true');
+    localStorage.setItem('rwceUserRole','manager');
     localStorage.setItem('rwceActiveUser','Manager');
     if(error) error.classList.add('hidden-view');
     enterAdminPortal();
@@ -1361,6 +1424,7 @@ async function logoutToLogin(){
   localStorage.removeItem('rwcePortalAuthed');
   localStorage.removeItem('rwceManagerAuthed');
   localStorage.removeItem('rwceActiveUser');
+  localStorage.removeItem('rwceUserRole');
   closeManagerLogin();
   const frame=document.getElementById('moduleFrame');
   if(frame) frame.src='about:blank';
@@ -1376,6 +1440,7 @@ function enterAdminPortal(){
   closeManagerLogin();
   showOnly('adminPortal');
   updateManagerVisibility();
+  showAdminTab('dashboard');
   renderAll();
   forcePortalTop();
 }
@@ -1462,10 +1527,11 @@ async function managerLogin(){
   const email=document.getElementById('managerEmail').value.trim().toLowerCase(); const pass=document.getElementById('managerPassword').value;
   if(isSupabaseConfigured()){
     const result = await supabaseSignIn(email, pass);
-    const role = result.profile?.role;
-    if(result.ok && (role === 'manager' || role === 'admin')){
+    const role = normalizeRole(result.profile?.role || 'learner');
+    if(result.ok && isManagerRole(role)){
       localStorage.setItem('rwcePortalAuthed','true');
       localStorage.setItem('rwceManagerAuthed','true');
+      localStorage.setItem('rwceUserRole', role);
       localStorage.setItem('rwceActiveUser', result.profile?.full_name || 'Manager');
       const err=document.getElementById('loginError'); if(err) err.classList.add('hidden-view');
       enterAdminPortal();
@@ -1478,20 +1544,30 @@ async function managerLogin(){
   if(email==='manager@realworldce.org' && pass==='manager123'){
     localStorage.setItem('rwcePortalAuthed','true');
     localStorage.setItem('rwceManagerAuthed','true');
+    localStorage.setItem('rwceUserRole','manager');
     localStorage.setItem('rwceActiveUser','Manager');
     const err=document.getElementById('loginError'); if(err) err.classList.add('hidden-view');
     enterAdminPortal();
   }
   else document.getElementById('loginError').classList.remove('hidden-view');
 }
-async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwcePortalAuthed'); localStorage.removeItem('rwceManagerAuthed'); localStorage.removeItem('rwceActiveUser'); updateManagerVisibility(); showOnly('portalLogin'); forcePortalTop(); }
+async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem('rwcePortalAuthed'); localStorage.removeItem('rwceManagerAuthed'); localStorage.removeItem('rwceActiveUser'); localStorage.removeItem('rwceUserRole'); updateManagerVisibility(); showOnly('portalLogin'); forcePortalTop(); }
 function showPublicSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function showAdminTab(tab){
+  updateManagerVisibility();
+  if(tab === 'settings' && !isAdminUser()){
+    tab = 'dashboard';
+  }
+  const target=document.getElementById('admin-'+tab);
+  if(!target) return;
   document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
-  document.getElementById('admin-'+tab).classList.remove('hidden-view');
+  if(tab === 'settings' && isAdminUser()) target.style.display = '';
+  target.classList.remove('hidden-view');
   document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
-  const active=document.querySelector(`[data-tab="${tab}"]`); active.classList.add('tab-active');
+  const active=document.querySelector(`[data-tab="${tab}"]`);
+  if(active) active.classList.add('tab-active');
   document.getElementById('adminTitle').textContent = tab==='dashboard'?'System Overview':tab==='learners'?'User Reports':tab==='analytics'?'Module Analytics':'Settings';
+  enforceAdminOnlySettings();
 }
 function calcStats(){
   const data=getActivity(); const completed=data.filter(x=>x.status==='Completed');
@@ -1513,7 +1589,7 @@ function renderAnalytics(){
   const grid=document.getElementById('analyticsGrid'); if(!grid) return; const data=getActivity();
   grid.innerHTML = modules.map(m=>{ const rows=data.filter(x=>x.moduleId===m.id); const completions=rows.filter(x=>x.status==='Completed').length; const starts=rows.length; const avg=rows.length?Math.round(rows.reduce((s,x)=>s+x.time,0)/rows.length):0; const credits=rows.reduce((s,x)=>s+Number(x.credits||0),0); const pct=starts?Math.round((completions/starts)*100):0; return `<div class="analytics-card rounded-[2rem] p-6"><div class="relative z-10"><div class="flex items-start justify-between gap-4"><div><div class="text-xs text-blue-700 uppercase font-black tracking-widest">${m.topic}</div><h3 class="text-xl font-black text-medicalBlue mt-2">${m.title}</h3></div><span class="status-pill status-started">${m.credits} CME</span></div><div class="grid grid-cols-4 gap-3 mt-5 text-center"><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${starts}</div><div class="text-[10px] text-slate-500 uppercase font-black">Starts</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${completions}</div><div class="text-[10px] text-slate-500 uppercase font-black">Done</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${credits.toFixed(1)}</div><div class="text-[10px] text-slate-500 uppercase font-black">Credits</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${avg}m</div><div class="text-[10px] text-slate-500 uppercase font-black">Avg</div></div></div><div class="mt-5"><div class="flex justify-between text-xs text-slate-500 mb-2"><span>Completion Rate</span><span>${pct}%</span></div><div class="meter"><span style="width:${pct}%"></span></div></div></div></div>`; }).join('');
 }
-function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); updateActiveUserDisplay(); }
+function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); updateManagerVisibility(); }
 function seedDemoData(){
   const now=Date.now(); const data=[]; for(let i=0;i<18;i++){ const m=modules[i%modules.length]; const l=demoLearners[i%demoLearners.length]; const completed=i%4!==0; data.push({id:cryptoId(), learner:l.name, email:l.email, org:l.org, moduleId:m.id, module:m.title, topic:m.topic, progress:completed?100:35+((i*7)%45), time:18+((i*9)%68), credits:completed?m.credits:0, status:completed?'Completed':'In Progress', date:new Date(now - i*86400000/1.7).toISOString()}); } setActivity(data);
 }
@@ -1533,6 +1609,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   localStorage.removeItem('rwcePortalAuthed');
   localStorage.removeItem('rwceManagerAuthed');
   localStorage.removeItem('rwceActiveUser');
+  localStorage.removeItem('rwceUserRole');
   rwceCurrentUser = null;
   rwceProfile = null;
   updateManagerVisibility();
