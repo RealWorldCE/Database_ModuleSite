@@ -887,6 +887,8 @@
           <button data-tab="dashboard" onclick="showAdminTab('dashboard')" class="admin-tab tab-active w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">dashboard</span>Dashboard</button>
           <button data-tab="learners" onclick="showAdminTab('learners')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">group</span>User Reports</button>
           <button data-tab="analytics" onclick="showAdminTab('analytics')" class="admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold"><span class="material-symbols-outlined">monitoring</span>Module Analytics</button>
+          <button data-tab="users" onclick="showAdminTab('users')" class="admin-only hidden-view admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold" aria-hidden="true" disabled style="display:none"><span class="material-symbols-outlined">person_add</span>User Management</button>
+          <button data-tab="module-upload" onclick="showAdminTab('module-upload')" class="admin-only hidden-view admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold" aria-hidden="true" disabled style="display:none"><span class="material-symbols-outlined">upload_file</span>Module Upload</button>
           <button data-tab="settings" onclick="showAdminTab('settings')" class="admin-only hidden-view admin-tab w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-transparent text-left font-bold" aria-hidden="true" disabled style="display:none"><span class="material-symbols-outlined">settings</span>Settings</button>
         </nav>
         <div class="bottom-actions absolute bottom-4 left-4 right-4">
@@ -926,6 +928,164 @@
 
           <section id="admin-analytics" class="admin-view hidden-view">
             <div id="analyticsGrid" class="grid lg:grid-cols-2 gap-5"></div>
+          </section>
+
+          <section id="admin-users" class="admin-only admin-view hidden-view" aria-hidden="true" style="display:none">
+            <div class="settings-shell glass rounded-[2rem] p-6 max-w-5xl">
+              <div class="relative z-10">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+                  <div>
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Administrator Access</div>
+                    <h2 class="text-2xl font-black text-medicalBlue mt-1">Add New Site User</h2>
+                    <p class="text-slate-600 leading-7 mt-2 max-w-2xl">Create learner, manager, or administrator access for the Real World CE portal. This screen is hidden from managers and learners.</p>
+                  </div>
+                  <span class="status-pill status-started">Admin Only</span>
+                </div>
+
+                <form id="addUserForm" onsubmit="event.preventDefault(); createSiteUser();" class="grid md:grid-cols-2 gap-4">
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Full Name</span>
+                    <input id="newUserFullName" required class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Enter user's full name" type="text" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Email</span>
+                    <input id="newUserEmail" required class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="name@example.com" type="email" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Role</span>
+                    <select id="newUserRole" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold">
+                      <option value="learner">Learner</option>
+                      <option value="manager">Manager</option>
+                      <option value="admin">Administrator</option>
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Organization</span>
+                    <input id="newUserOrganization" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Real World CE" type="text" value="Real World CE" />
+                  </label>
+                  <label class="block md:col-span-2">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Temporary Password</span>
+                    <input id="newUserPassword" required minlength="8" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Minimum 8 characters" type="text" />
+                  </label>
+                  <div class="md:col-span-2 flex flex-col sm:flex-row gap-3 pt-2">
+                    <button id="addUserButton" type="submit" class="btn-primary inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-5 font-black">
+                      <span class="material-symbols-outlined text-[20px]">person_add</span>Create User
+                    </button>
+                    <button type="button" onclick="document.getElementById('addUserForm')?.reset(); document.getElementById('newUserOrganization').value='Real World CE'; hideAddUserStatus();" class="main-menu-btn">Clear Form</button>
+                  </div>
+                </form>
+
+                <div id="addUserStatus" class="hidden-view mt-5 rounded-2xl px-4 py-3 text-sm font-bold"></div>
+
+                <div class="table-shell glass-soft overflow-hidden mt-6">
+                  <div class="p-5 border-b border-slate-200/80 relative z-10">
+                    <h3 class="font-black text-medicalBlue">Recently Added Users</h3>
+                    <p class="text-sm text-slate-500 mt-1">This list shows users added from this browser session.</p>
+                  </div>
+                  <div class="overflow-x-auto relative z-10">
+                    <table class="rw-table">
+                      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Organization</th><th>Added</th></tr></thead>
+                      <tbody id="createdUsersTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="glass-soft rounded-3xl p-5 mt-5">
+                  <div class="font-black text-medicalBlue mb-2">Secure user creation note</div>
+                  <p class="text-slate-500 text-sm leading-6">The portal first calls a secure Supabase Edge Function named <span class="font-black text-medicalBlue">create-site-user</span>. If that function is not deployed, it falls back to Supabase sign-up using the public anon key. Do not place a Supabase service-role key inside this HTML file.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="admin-module-upload" class="admin-only admin-view hidden-view" aria-hidden="true" style="display:none">
+            <div class="settings-shell glass rounded-[2rem] p-6 max-w-6xl">
+              <div class="relative z-10">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+                  <div>
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Administrator Access</div>
+                    <h2 class="text-2xl font-black text-medicalBlue mt-1">Upload Learning Module</h2>
+                    <p class="text-slate-600 leading-7 mt-2 max-w-3xl">Add a new learning module to the portal by entering an existing launch URL or uploading a self-contained HTML start file. Uploaded modules are stored in Supabase Storage and saved to the modules database table.</p>
+                  </div>
+                  <span class="status-pill status-started">Admin Only</span>
+                </div>
+
+                <form id="moduleUploadForm" onsubmit="event.preventDefault(); createLearningModuleFromPortal();" class="grid lg:grid-cols-2 gap-4">
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Module Title</span>
+                    <input id="uploadModuleTitle" required class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Example: Heart Failure Case Challenge" type="text" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Clinical Area / Specialty</span>
+                    <input id="uploadModuleTopic" required class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Hematology/Oncology, Immunology, Urology..." type="text" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Learning Format</span>
+                    <select id="uploadModuleFormat" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold">
+                      <option value="Real World Sim">Real World Sim</option>
+                      <option value="Real World Patient">Real World Patient</option>
+                      <option value="Real World Data">Real World Data</option>
+                      <option value="Real World Quiz">Real World Quiz</option>
+                      <option value="Real Case">Real Case</option>
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Credit Amount</span>
+                    <input id="uploadModuleCredits" required class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" min="0" step="0.25" type="number" value="1.0" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Status</span>
+                    <select id="uploadModuleStatus" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold">
+                      <option value="active">Active / Show in Library</option>
+                      <option value="draft">Draft / Save Only</option>
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Repository / Source Label</span>
+                    <input id="uploadModuleRepository" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Optional. Example: RealWorldCE/New-Module" type="text" />
+                  </label>
+                  <label class="block lg:col-span-2">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Existing Launch URL</span>
+                    <input id="uploadModuleUrl" class="glass-soft h-12 w-full rounded-2xl px-4 text-sm font-bold" placeholder="Optional if you upload an HTML start file" type="url" />
+                  </label>
+                  <label class="block lg:col-span-2">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Upload Module Start File</span>
+                    <input id="uploadModuleFile" class="glass-soft w-full rounded-2xl px-4 py-3 text-sm font-bold" accept=".html,.htm,text/html" type="file" />
+                    <span class="mt-2 block text-xs text-slate-500 font-semibold">Best for a single self-contained HTML module. If the module has many files, upload the hosted launch URL instead.</span>
+                  </label>
+                  <label class="block lg:col-span-2">
+                    <span class="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-500">Description</span>
+                    <textarea id="uploadModuleDescription" class="glass-soft min-h-[110px] w-full rounded-2xl px-4 py-3 text-sm font-semibold" placeholder="Briefly describe the learning module..."></textarea>
+                  </label>
+                  <div class="lg:col-span-2 flex flex-col sm:flex-row gap-3 pt-2">
+                    <button id="moduleUploadButton" type="submit" class="btn-primary inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-5 font-black">
+                      <span class="material-symbols-outlined text-[20px]">upload_file</span>Save Learning Module
+                    </button>
+                    <button type="button" onclick="clearModuleUploadForm()" class="main-menu-btn">Clear Form</button>
+                  </div>
+                </form>
+
+                <div id="moduleUploadStatus" class="hidden-view mt-5 rounded-2xl px-4 py-3 text-sm font-bold"></div>
+
+                <div class="table-shell glass-soft overflow-hidden mt-6">
+                  <div class="p-5 border-b border-slate-200/80 relative z-10">
+                    <h3 class="font-black text-medicalBlue">Recently Uploaded Modules</h3>
+                    <p class="text-sm text-slate-500 mt-1">Modules added from this administrator portal session.</p>
+                  </div>
+                  <div class="overflow-x-auto relative z-10">
+                    <table class="rw-table">
+                      <thead><tr><th>Module</th><th>Clinical Area</th><th>Format</th><th>Credits</th><th>Status</th><th>Added</th></tr></thead>
+                      <tbody id="uploadedModulesTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="glass-soft rounded-3xl p-5 mt-5">
+                  <div class="font-black text-medicalBlue mb-2">Module upload note</div>
+                  <p class="text-slate-500 text-sm leading-6">Create a Supabase Storage bucket named <span class="font-black text-medicalBlue">learning-modules</span>. For production, keep upload permission limited to administrators through Storage policies or a secure Edge Function. Do not place a service-role key inside this HTML file.</p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section id="admin-settings" class="admin-only admin-view hidden-view" aria-hidden="true" style="display:none">
@@ -1275,11 +1435,12 @@ const demoLearners = [
 // SUPABASE CONFIG
 // 1) Run the included rwce_supabase_setup.sql file in Supabase SQL Editor.
 // 2) Replace the two values below with your Supabase Project URL and public anon key.
-// 3) Create users in Supabase Authentication. Set manager users to role='manager' and administrator users to role='admin' in public.profiles.
+// 3) Administrators can add users from the User Management tab. For production, deploy a secure Edge Function named create-site-user that uses the service_role key server-side.
 // Note: Keep the service_role key OUT of this HTML file. Only use the public anon key here.
 // ================================
 const RWCE_SUPABASE_URL = 'https://mfcvunvlmacwxoguznoh.supabase.co';
 const RWCE_SUPABASE_ANON_KEY = 'sb_publishable_zoW-NAwVPqKBz2vQco7G4g_hAUBeUrW';
+const RWCE_MODULE_BUCKET = 'learning-modules';
 let rwceSupabase = null;
 let rwceCurrentUser = null;
 let rwceProfile = null;
@@ -1327,6 +1488,7 @@ async function restoreSupabaseSession(){
   if(isManagerRole(role)) localStorage.setItem('rwceManagerAuthed','true');
   else localStorage.removeItem('rwceManagerAuthed');
   await refreshSupabaseActivity(false);
+  await loadSupabaseModules();
   return true;
 }
 async function supabaseSignIn(email,password){
@@ -1336,6 +1498,7 @@ async function supabaseSignIn(email,password){
   rwceCurrentUser = data.user;
   rwceProfile = await getSupabaseProfile(data.user);
   await refreshSupabaseActivity(false);
+  await loadSupabaseModules();
   return { ok:true, user:data.user, profile:rwceProfile };
 }
 async function supabaseSignOut(){
@@ -1455,6 +1618,424 @@ function moduleSearchText(module){
   return `${module.title} ${module.short} ${module.condition || ''} ${module.topic} ${(module.categories||[]).join(' ')} ${module.format || ''} ${module.formatGroup || ''} ${module.repo} ${module.description}`.toLowerCase();
 }
 
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+}
+function getCreatedUsers(){
+  try { return JSON.parse(localStorage.getItem('rwceCreatedUsers') || '[]'); }
+  catch(e){ return []; }
+}
+function setCreatedUsers(users){
+  localStorage.setItem('rwceCreatedUsers', JSON.stringify(Array.isArray(users) ? users : []));
+}
+function addCreatedUserRecord(payload, userId=''){
+  const users=getCreatedUsers();
+  users.unshift({
+    id: userId || cryptoId(),
+    full_name: payload.full_name,
+    email: payload.email,
+    role: payload.role,
+    organization: payload.organization || 'Real World CE',
+    created_at: new Date().toISOString()
+  });
+  setCreatedUsers(users.slice(0,25));
+  renderCreatedUsers();
+}
+function renderCreatedUsers(){
+  const tbody=document.getElementById('createdUsersTable');
+  if(!tbody) return;
+  const rows=getCreatedUsers();
+  tbody.innerHTML = rows.length ? rows.map(user=>`<tr>
+    <td><div class="font-bold text-medicalBlue">${escapeHtml(user.full_name)}</div></td>
+    <td>${escapeHtml(user.email)}</td>
+    <td><span class="status-pill ${user.role === 'admin' ? 'status-started' : user.role === 'manager' ? 'status-progress' : 'status-complete'}">${escapeHtml(user.role === 'admin' ? 'Administrator' : user.role)}</span></td>
+    <td>${escapeHtml(user.organization || 'Real World CE')}</td>
+    <td>${fmtDate(user.created_at)}</td>
+  </tr>`).join('') : `<tr><td colspan="5" class="text-center text-slate-500 py-8">No users have been added from this portal yet.</td></tr>`;
+}
+function showAddUserStatus(message, type='info'){
+  const node=document.getElementById('addUserStatus');
+  if(!node) return;
+  const styles={
+    success:'border border-emerald-200 bg-emerald-50 text-emerald-800',
+    warning:'border border-amber-200 bg-amber-50 text-amber-800',
+    error:'border border-rose-200 bg-rose-50 text-rose-800',
+    info:'border border-blue-200 bg-blue-50 text-blue-800'
+  };
+  node.className = `mt-5 rounded-2xl px-4 py-3 text-sm font-bold ${styles[type] || styles.info}`;
+  node.innerHTML = message;
+  node.classList.remove('hidden-view');
+}
+function hideAddUserStatus(){
+  const node=document.getElementById('addUserStatus');
+  if(node) node.classList.add('hidden-view');
+}
+function showModuleUploadStatus(message, type='info'){
+  const node=document.getElementById('moduleUploadStatus');
+  if(!node) return;
+  const styles={
+    success:'border border-emerald-200 bg-emerald-50 text-emerald-800',
+    warning:'border border-amber-200 bg-amber-50 text-amber-800',
+    error:'border border-rose-200 bg-rose-50 text-rose-800',
+    info:'border border-blue-200 bg-blue-50 text-blue-800'
+  };
+  node.className = `mt-5 rounded-2xl px-4 py-3 text-sm font-bold ${styles[type] || styles.info}`;
+  node.innerHTML = message;
+  node.classList.remove('hidden-view');
+}
+function hideModuleUploadStatus(){
+  const node=document.getElementById('moduleUploadStatus');
+  if(node) node.classList.add('hidden-view');
+}
+function clearModuleUploadForm(){
+  document.getElementById('moduleUploadForm')?.reset();
+  const credits=document.getElementById('uploadModuleCredits'); if(credits) credits.value='1.0';
+  hideModuleUploadStatus();
+}
+function slugifyModuleTitle(value){
+  return String(value || 'module').toLowerCase().trim().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80) || 'module';
+}
+function formatGroupFromFormat(format){
+  const value=String(format || '').toLowerCase();
+  if(value.includes('sim')) return 'Simulations';
+  if(value.includes('patient')) return 'Patients';
+  if(value.includes('data')) return 'Data';
+  if(value.includes('quiz') || value.includes('assessment')) return 'Assessments';
+  if(value.includes('case')) return 'Cases';
+  return 'Patients';
+}
+function moduleObjectFromPayload(payload, dbId=''){
+  const slug=payload.slug || slugifyModuleTitle(payload.title);
+  const formatGroup=formatGroupFromFormat(payload.format);
+  return {
+    id: slug,
+    dbId: dbId || payload.id || '',
+    condition: payload.title,
+    title: payload.title,
+    short: payload.title,
+    topic: payload.topic,
+    categories: Array.from(new Set([payload.topic, formatGroup].filter(Boolean))),
+    format: payload.format,
+    formatGroup,
+    icon: formatGroup === 'Data' ? 'database' : formatGroup === 'Assessments' ? 'quiz' : formatGroup === 'Cases' ? 'assignment' : 'clinical_notes',
+    credits: Number(payload.credits || 0),
+    repo: payload.repository || `Uploaded/${slug}`,
+    url: payload.url,
+    description: payload.description || 'Uploaded Real World CE learning module.'
+  };
+}
+function addOrUpdateLocalModule(module){
+  const idx=modules.findIndex(m=>m.id===module.id || m.repo===module.repo || m.url===module.url);
+  if(idx>=0) modules[idx] = {...modules[idx], ...module};
+  else modules.unshift(module);
+  if(module.topic && !moduleFilterTabs.includes(module.topic)) moduleFilterTabs.splice(1,0,module.topic);
+  if(module.formatGroup && !moduleFilterTabs.includes(module.formatGroup)) moduleFilterTabs.push(module.formatGroup);
+  renderModules({preserveScroll:true});
+  renderStats();
+  renderAnalytics();
+}
+function getUploadedModules(){
+  try { return JSON.parse(localStorage.getItem('rwceUploadedModules') || '[]'); }
+  catch(e){ return []; }
+}
+function setUploadedModules(rows){
+  localStorage.setItem('rwceUploadedModules', JSON.stringify(Array.isArray(rows) ? rows : []));
+}
+function addUploadedModuleRecord(module){
+  const rows=getUploadedModules();
+  rows.unshift({
+    id: module.id || cryptoId(),
+    title: module.title,
+    topic: module.topic,
+    format: module.format,
+    credits: module.credits,
+    status: module.status || 'active',
+    created_at: new Date().toISOString()
+  });
+  setUploadedModules(rows.slice(0,25));
+  renderUploadedModules();
+}
+function renderUploadedModules(){
+  const tbody=document.getElementById('uploadedModulesTable');
+  if(!tbody) return;
+  const rows=getUploadedModules();
+  tbody.innerHTML = rows.length ? rows.map(module=>`<tr>
+    <td><div class="font-bold text-medicalBlue">${escapeHtml(module.title)}</div></td>
+    <td>${escapeHtml(module.topic || 'Clinical Education')}</td>
+    <td>${escapeHtml(module.format || 'Module')}</td>
+    <td>${Number(module.credits || 0).toFixed(2)}</td>
+    <td><span class="status-pill ${module.status === 'active' ? 'status-complete' : 'status-progress'}">${escapeHtml(module.status || 'active')}</span></td>
+    <td>${fmtDate(module.created_at)}</td>
+  </tr>`).join('') : `<tr><td colspan="6" class="text-center text-slate-500 py-8">No learning modules have been uploaded from this portal yet.</td></tr>`;
+}
+function readModuleUploadForm(){
+  const title=(document.getElementById('uploadModuleTitle')?.value || '').trim();
+  const topic=(document.getElementById('uploadModuleTopic')?.value || '').trim();
+  const format=(document.getElementById('uploadModuleFormat')?.value || 'Real World Patient').trim();
+  const credits=Number(document.getElementById('uploadModuleCredits')?.value || 0);
+  const status=(document.getElementById('uploadModuleStatus')?.value || 'active').trim();
+  const repository=(document.getElementById('uploadModuleRepository')?.value || '').trim();
+  const url=(document.getElementById('uploadModuleUrl')?.value || '').trim();
+  const description=(document.getElementById('uploadModuleDescription')?.value || '').trim();
+  const file=document.getElementById('uploadModuleFile')?.files?.[0] || null;
+  const slug=slugifyModuleTitle(title);
+  return {title, topic, format, credits, status, repository, url, description, file, slug};
+}
+async function uploadModuleStartFile(payload){
+  if(!payload.file) return { ok:true, url:payload.url || '', path:'' };
+  if(!rwceSupabaseReady && !initSupabase()) return { ok:false, error:'Supabase is not configured yet.' };
+  const safeName=(payload.file.name || 'index.html').replace(/[^a-zA-Z0-9._-]/g,'-');
+  const storagePath=`${payload.slug}/${Date.now()}-${safeName}`;
+  const { error } = await rwceSupabase.storage
+    .from(RWCE_MODULE_BUCKET)
+    .upload(storagePath, payload.file, {
+      cacheControl:'3600',
+      upsert:true,
+      contentType:payload.file.type || 'text/html'
+    });
+  if(error) return { ok:false, error:error.message || 'Storage upload failed.' };
+  const { data } = rwceSupabase.storage.from(RWCE_MODULE_BUCKET).getPublicUrl(storagePath);
+  return { ok:true, url:data?.publicUrl || '', path:storagePath };
+}
+async function insertLearningModuleRecord(payload, launchUrl, storagePath=''){
+  if(!rwceSupabaseReady && !initSupabase()) return { ok:false, error:'Supabase is not configured yet.' };
+  const repository = payload.repository || `Uploaded/${payload.slug}`;
+  const baseRecord = {
+    title: payload.title,
+    repository,
+    module_url: launchUrl,
+    specialty: payload.topic,
+    format: payload.format,
+    credit_amount: payload.credits,
+    status: payload.status,
+    description: payload.description || null,
+    storage_path: storagePath || null,
+    created_by: rwceCurrentUser?.id || null
+  };
+
+  let { data, error } = await rwceSupabase
+    .from('modules')
+    .insert(baseRecord)
+    .select('*')
+    .single();
+
+  if(error && /column|schema cache|created_by|storage_path|description|format|credit_amount|specialty|module_url/i.test(error.message || '')){
+    const minimalRecord = {
+      title: payload.title,
+      repository,
+      module_url: launchUrl,
+      specialty: payload.topic,
+      credit_amount: payload.credits,
+      status: payload.status
+    };
+    const retry = await rwceSupabase
+      .from('modules')
+      .insert(minimalRecord)
+      .select('*')
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
+
+  if(error) return { ok:false, error:error.message || 'Database insert failed.' };
+  return { ok:true, data:data || {...baseRecord, repository} };
+}
+function moduleFromSupabaseRow(row){
+  const title=row.title || row.name || 'Learning Module';
+  const url=row.module_url || row.url || row.launch_url || row.link || '';
+  const topic=row.specialty || row.topic || row.clinical_area || 'Clinical Education';
+  const format=row.format || row.module_format || row.type || 'Real World Patient';
+  const credits=Number(row.credit_amount ?? row.credits ?? row.credit ?? 0);
+  const slug=row.slug || row.module_slug || slugifyModuleTitle(title);
+  return moduleObjectFromPayload({
+    id: row.id,
+    title,
+    topic,
+    format,
+    credits,
+    status: row.status || 'active',
+    repository: row.repository || `Uploaded/${slug}`,
+    url,
+    description: row.description || '',
+    slug
+  }, row.id || '');
+}
+async function loadSupabaseModules(){
+  if(!rwceSupabaseReady && !initSupabase()) return;
+  const { data, error } = await rwceSupabase
+    .from('modules')
+    .select('*')
+    .in('status', ['active','live','published'])
+    .order('created_at', { ascending:false });
+  if(error){ console.warn('Supabase module load failed:', error.message); return; }
+  (data || []).forEach(row=>{
+    const module=moduleFromSupabaseRow(row);
+    if(module.url) addOrUpdateLocalModule(module);
+    if(row.id && module.repo) moduleUuidCache.set(module.repo, row.id);
+  });
+}
+async function createLearningModuleFromPortal(){
+  if(!isAdminUser()){
+    showModuleUploadStatus('Only administrators can upload learning modules.', 'error');
+    return;
+  }
+  const payload=readModuleUploadForm();
+  if(!payload.title || !payload.topic){
+    showModuleUploadStatus('Enter a module title and clinical area.', 'error');
+    return;
+  }
+  if(!payload.url && !payload.file){
+    showModuleUploadStatus('Add an existing launch URL or upload a module start file.', 'error');
+    return;
+  }
+  if(payload.file && !/\.html?$/i.test(payload.file.name || '')){
+    showModuleUploadStatus('Upload a self-contained .html or .htm start file. For multi-file modules, paste the hosted launch URL instead.', 'error');
+    return;
+  }
+  const button=document.getElementById('moduleUploadButton');
+  if(button){ button.disabled=true; button.classList.add('opacity-70','cursor-not-allowed'); }
+  showModuleUploadStatus('Saving learning module...', 'info');
+
+  try{
+    const uploadResult = await uploadModuleStartFile(payload);
+    if(!uploadResult.ok){
+      showModuleUploadStatus('Module file could not be uploaded: ' + escapeHtml(uploadResult.error), 'error');
+      return;
+    }
+    const launchUrl = uploadResult.url || payload.url;
+    const dbResult = await insertLearningModuleRecord(payload, launchUrl, uploadResult.path);
+    if(!dbResult.ok){
+      showModuleUploadStatus('Module was not saved to the database: ' + escapeHtml(dbResult.error), 'error');
+      return;
+    }
+    const module = moduleFromSupabaseRow(dbResult.data);
+    module.url = launchUrl;
+    module.status = payload.status;
+    addOrUpdateLocalModule(module);
+    addUploadedModuleRecord(module);
+    showModuleUploadStatus(`Saved module: ${escapeHtml(module.title)}. It is now available in the Module Library if status is active.`, 'success');
+    clearModuleUploadForm();
+  } catch(error){
+    showModuleUploadStatus('Module could not be saved: ' + escapeHtml(error?.message || String(error)), 'error');
+  } finally {
+    if(button){ button.disabled=false; button.classList.remove('opacity-70','cursor-not-allowed'); }
+  }
+}
+
+function readAddUserForm(){
+  return {
+    full_name:(document.getElementById('newUserFullName')?.value || '').trim(),
+    email:(document.getElementById('newUserEmail')?.value || '').trim().toLowerCase(),
+    role:normalizeRole(document.getElementById('newUserRole')?.value || 'learner'),
+    organization:(document.getElementById('newUserOrganization')?.value || 'Real World CE').trim() || 'Real World CE',
+    password:(document.getElementById('newUserPassword')?.value || '').trim()
+  };
+}
+async function createUserWithEdgeFunction(payload){
+  if(!rwceSupabaseReady && !initSupabase()) return { ok:false, error:'Supabase is not configured yet.' };
+  const { data, error } = await rwceSupabase.functions.invoke('create-site-user', {
+    body: payload
+  });
+  if(error) return { ok:false, error:error.message || 'Edge Function create-site-user failed.' };
+  if(data?.ok === false) return { ok:false, error:data.error || 'Edge Function create-site-user failed.' };
+  return { ok:true, user:data?.user || data, warning:data?.warning || '' };
+}
+async function createUserWithSignupFallback(payload){
+  if(!window.supabase || !isSupabaseConfigured()) return { ok:false, error:'Supabase is not configured yet.' };
+  const signupClient = window.supabase.createClient(RWCE_SUPABASE_URL, RWCE_SUPABASE_ANON_KEY, {
+    auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false }
+  });
+  const { data, error } = await signupClient.auth.signUp({
+    email: payload.email,
+    password: payload.password,
+    options: {
+      data: {
+        full_name: payload.full_name,
+        role: payload.role,
+        organization: payload.organization
+      }
+    }
+  });
+  if(error) return { ok:false, error:error.message };
+
+  let warning = '';
+  const userId = data?.user?.id || '';
+  if(userId && rwceSupabase){
+    let { error: profileError } = await rwceSupabase
+      .from('profiles')
+      .upsert({ id:userId, email:payload.email, full_name:payload.full_name, role:payload.role, organization:payload.organization }, { onConflict:'id' });
+
+    if(profileError && /organization|column/i.test(profileError.message || '')){
+      const retry = await rwceSupabase
+        .from('profiles')
+        .upsert({ id:userId, email:payload.email, full_name:payload.full_name, role:payload.role }, { onConflict:'id' });
+      profileError = retry.error;
+    }
+
+    if(profileError){
+      warning = 'The auth user was created, but the profile/role update was blocked by database policy: ' + profileError.message;
+    }
+  }
+
+  if(!userId){
+    warning = warning || 'Supabase did not return a user id. The email may require confirmation or may already exist.';
+  }
+
+  return { ok:true, user:data?.user || null, warning };
+}
+async function createSiteUser(){
+  if(!isAdminUser()){
+    showAddUserStatus('Only administrators can add new users.', 'error');
+    return;
+  }
+  const payload=readAddUserForm();
+  if(!payload.full_name || !payload.email || !payload.password){
+    showAddUserStatus('Enter a full name, email, and temporary password.', 'error');
+    return;
+  }
+  if(payload.password.length < 8){
+    showAddUserStatus('Temporary password must be at least 8 characters.', 'error');
+    return;
+  }
+  if(!['learner','manager','admin','administrator'].includes(payload.role)){
+    showAddUserStatus('Choose a valid role: learner, manager, or administrator.', 'error');
+    return;
+  }
+  if(payload.role === 'administrator') payload.role = 'admin';
+
+  const button=document.getElementById('addUserButton');
+  if(button){ button.disabled=true; button.classList.add('opacity-70','cursor-not-allowed'); }
+  showAddUserStatus('Creating user account...', 'info');
+
+  try{
+    let result = await createUserWithEdgeFunction(payload);
+    let usedFallback = false;
+
+    if(!result.ok){
+      console.warn('create-site-user Edge Function unavailable or failed:', result.error);
+      usedFallback = true;
+      result = await createUserWithSignupFallback(payload);
+    }
+
+    if(!result.ok){
+      showAddUserStatus('User could not be created: ' + escapeHtml(result.error || 'Unknown error'), 'error');
+      return;
+    }
+
+    addCreatedUserRecord(payload, result.user?.id || '');
+    const roleLabel = payload.role === 'admin' ? 'Administrator' : payload.role.charAt(0).toUpperCase() + payload.role.slice(1);
+    const fallbackNote = usedFallback ? '<br><span class="font-semibold">Note:</span> Created with Supabase sign-up fallback. If email confirmation is enabled, the user may need to confirm their email before signing in.' : '';
+    const warningNote = result.warning ? `<br><span class="font-semibold">Warning:</span> ${escapeHtml(result.warning)}` : '';
+    showAddUserStatus(`Created ${escapeHtml(roleLabel)} user: ${escapeHtml(payload.email)}.${fallbackNote}${warningNote}`, result.warning ? 'warning' : 'success');
+    document.getElementById('addUserForm')?.reset();
+    const org=document.getElementById('newUserOrganization'); if(org) org.value='Real World CE';
+  } catch(error){
+    showAddUserStatus('User could not be created: ' + escapeHtml(error?.message || String(error)), 'error');
+  } finally {
+    if(button){ button.disabled=false; button.classList.remove('opacity-70','cursor-not-allowed'); }
+  }
+}
+
 function showOnly(viewId){
   ['portalLogin','publicSite','adminPortal','moduleViewer'].forEach(id=>{
     const node=document.getElementById(id);
@@ -1491,40 +2072,44 @@ function updateActiveUserDisplay(){
   document.querySelectorAll('.active-user-label').forEach(node=>{ node.textContent=name; });
 }
 function enforceAdminOnlySettings(){
-  const allowAdminSettings = isAdminUser();
-  const settingsTab = document.querySelector('[data-tab="settings"]');
-  const settingsView = document.getElementById('admin-settings');
+  const allowAdminAccess = isAdminUser();
+  const adminOnlyTabs = ['users', 'module-upload', 'settings'];
 
-  if(settingsTab){
-    settingsTab.classList.toggle('hidden-view', !allowAdminSettings);
-    settingsTab.style.display = allowAdminSettings ? '' : 'none';
-    settingsTab.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
-    settingsTab.disabled = !allowAdminSettings;
-  }
+  adminOnlyTabs.forEach(tabName => {
+    const tab = document.querySelector(`[data-tab="${tabName}"]`);
+    const view = document.getElementById('admin-' + tabName);
 
-  if(settingsView){
-    settingsView.style.display = allowAdminSettings ? '' : 'none';
-    settingsView.setAttribute('aria-hidden', allowAdminSettings ? 'false' : 'true');
+    if(tab){
+      tab.classList.toggle('hidden-view', !allowAdminAccess);
+      tab.style.display = allowAdminAccess ? '' : 'none';
+      tab.setAttribute('aria-hidden', allowAdminAccess ? 'false' : 'true');
+      tab.disabled = !allowAdminAccess;
+    }
 
-    if(!allowAdminSettings){
-      const wasTryingToOpenSettings = !settingsView.classList.contains('hidden-view') || settingsTab?.classList.contains('tab-active');
-      settingsView.classList.add('hidden-view');
+    if(view){
+      view.style.display = allowAdminAccess ? '' : 'none';
+      view.setAttribute('aria-hidden', allowAdminAccess ? 'false' : 'true');
+    }
+  });
 
-      /* Only move the user back to Dashboard if they were actually on Settings.
-         Do not force Dashboard every time; managers still need User Reports and Module Analytics to stay visible. */
-      if(wasTryingToOpenSettings){
-        document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
-        const dashboard = document.getElementById('admin-dashboard');
-        if(dashboard) dashboard.classList.remove('hidden-view');
-        document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
-        const dashboardTab = document.querySelector('[data-tab="dashboard"]');
-        if(dashboardTab) dashboardTab.classList.add('tab-active');
-        const title = document.getElementById('adminTitle');
-        if(title) title.textContent = 'System Overview';
-      }
+  if(!allowAdminAccess){
+    const activeAdminOnlyView = adminOnlyTabs
+      .map(tabName => document.getElementById('admin-' + tabName))
+      .find(view => view && !view.classList.contains('hidden-view'));
+
+    if(activeAdminOnlyView){
+      document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
+      const dashboard = document.getElementById('admin-dashboard');
+      if(dashboard) dashboard.classList.remove('hidden-view');
+      document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
+      const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+      if(dashboardTab) dashboardTab.classList.add('tab-active');
+      const title = document.getElementById('adminTitle');
+      if(title) title.textContent = 'System Overview';
     }
   }
 }
+
 function updateManagerVisibility(){
   const showManager = isManagerUser();
   const showAdmin = isAdminUser();
@@ -1644,17 +2229,10 @@ function renderModules(options={}){
         <div class="marketing-card__specialty"><span aria-hidden="true" class="material-symbols-outlined">${m.icon}</span><span>${areas}</span></div>
         <div class="marketing-card__badges"><span class="marketing-status-pill">${status}</span><span class="marketing-format-pill">${formatAsBadge(m.format)}</span></div>
       </div>
-      <div class="module-preview marketing-card__preview" aria-label="${m.title} module preview">
-        <div class="preview-window">
-          <div class="preview-window__bar"><span></span><span></span><span></span></div>
-          <div class="preview-window__body">
-            <span class="preview-window__eyebrow">${previewArea}</span>
-            <div class="preview-window__title">${m.short || m.title}</div>
-            <div class="preview-window__line" style="width:78%"></div>
-            <div class="preview-window__line" style="width:58%"></div>
-            <div class="preview-window__tiles"><span></span><span></span><span></span></div>
-          </div>
-        </div>
+      <div class="module-preview marketing-card__preview active-preview live-preview" aria-label="${m.title} live module preview">
+        <iframe class="module-live-frame" title="${m.title} live preview" loading="lazy" src="${m.url}" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="live-preview-fallback">Live preview could not render inside this card.<br/>Use Launch Experience or Open in New Tab.</div>
+        <div class="live-preview-badge"><span class="material-symbols-outlined">sensors</span> Live View</div>
         <div class="preview-caption"><span class="preview-title">${m.short || m.title}</span><span class="preview-subtitle">${m.format} • ${previewArea}</span></div>
       </div>
       <div class="marketing-card__body">
@@ -1673,6 +2251,7 @@ function renderModules(options={}){
       </div>
     </article>`;
   }).join('') : `<div class="glass rounded-3xl p-8 text-center text-slate-500 sm:col-span-2">No modules match your search.</div>`;
+  attachLivePreviewFallbacks();
   if(preserveScroll){
     restoreScrollPosition(previousScrollX, previousScrollY, activeElementId);
     requestAnimationFrame(()=>restoreScrollPosition(previousScrollX, previousScrollY, activeElementId));
@@ -1733,18 +2312,20 @@ async function logoutManager(){ await supabaseSignOut(); localStorage.removeItem
 function showPublicSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function showAdminTab(tab){
   updateManagerVisibility();
-  if(tab === 'settings' && !isAdminUser()){
+  const adminOnlyTabs = ['users', 'module-upload', 'settings'];
+  if(adminOnlyTabs.includes(tab) && !isAdminUser()){
     tab = 'dashboard';
   }
   const target=document.getElementById('admin-'+tab);
   if(!target) return;
   document.querySelectorAll('.admin-view').forEach(v=>v.classList.add('hidden-view'));
-  if(tab === 'settings' && isAdminUser()) target.style.display = '';
+  if(adminOnlyTabs.includes(tab) && isAdminUser()) target.style.display = '';
   target.classList.remove('hidden-view');
   document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('tab-active'));
   const active=document.querySelector(`[data-tab="${tab}"]`);
   if(active) active.classList.add('tab-active');
-  document.getElementById('adminTitle').textContent = tab==='dashboard'?'System Overview':tab==='learners'?'User Reports':tab==='analytics'?'Module Analytics':'Settings';
+  const titles={dashboard:'System Overview', learners:'User Reports', analytics:'Module Analytics', users:'User Management', 'module-upload':'Module Upload', settings:'Settings'};
+  document.getElementById('adminTitle').textContent = titles[tab] || 'Manager Portal';
   enforceAdminOnlySettings();
 }
 function calcStats(){
@@ -1767,7 +2348,7 @@ function renderAnalytics(){
   const grid=document.getElementById('analyticsGrid'); if(!grid) return; const data=getActivity();
   grid.innerHTML = modules.map(m=>{ const rows=data.filter(x=>x.moduleId===m.id); const completions=rows.filter(x=>x.status==='Completed').length; const starts=rows.length; const avg=rows.length?Math.round(rows.reduce((s,x)=>s+x.time,0)/rows.length):0; const credits=rows.reduce((s,x)=>s+Number(x.credits||0),0); const pct=starts?Math.round((completions/starts)*100):0; return `<div class="analytics-card rounded-[2rem] p-6"><div class="relative z-10"><div class="flex items-start justify-between gap-4"><div><div class="text-xs text-blue-700 uppercase font-black tracking-widest">${m.topic}</div><h3 class="text-xl font-black text-medicalBlue mt-2">${m.title}</h3></div><span class="status-pill status-started">${m.credits} CME</span></div><div class="grid grid-cols-4 gap-3 mt-5 text-center"><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${starts}</div><div class="text-[10px] text-slate-500 uppercase font-black">Starts</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${completions}</div><div class="text-[10px] text-slate-500 uppercase font-black">Done</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${credits.toFixed(1)}</div><div class="text-[10px] text-slate-500 uppercase font-black">Credits</div></div><div class="glass-soft rounded-2xl p-3"><div class="text-2xl font-black text-medicalBlue">${avg}m</div><div class="text-[10px] text-slate-500 uppercase font-black">Avg</div></div></div><div class="mt-5"><div class="flex justify-between text-xs text-slate-500 mb-2"><span>Completion Rate</span><span>${pct}%</span></div><div class="meter"><span style="width:${pct}%"></span></div></div></div></div>`; }).join('');
 }
-function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); updateManagerVisibility(); }
+function renderAll(){ renderModules(); renderStats(); renderRecentTable(); renderLearnerTable(); renderAnalytics(); renderCreatedUsers(); renderUploadedModules(); updateManagerVisibility(); }
 function seedDemoData(){
   const now=Date.now(); const data=[]; for(let i=0;i<18;i++){ const m=modules[i%modules.length]; const l=demoLearners[i%demoLearners.length]; const completed=i%4!==0; data.push({id:cryptoId(), learner:l.name, email:l.email, org:l.org, moduleId:m.id, module:m.title, topic:m.topic, progress:completed?100:35+((i*7)%45), time:18+((i*9)%68), credits:completed?m.credits:0, status:completed?'Completed':'In Progress', date:new Date(now - i*86400000/1.7).toISOString()}); } setActivity(data);
 }
