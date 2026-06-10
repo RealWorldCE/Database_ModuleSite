@@ -2304,7 +2304,7 @@
 <div class="mt-2 text-blue-100/75 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em]">Module Portal</div>
 <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-blue-100/80">
 <span class="material-symbols-outlined text-[16px]">verified_user</span>
-        Database Access
+        Secure Database Access
       </div>
 </div>
 <form autocomplete="off" class="space-y-4" id="secureLoginForm">
@@ -3004,109 +3004,103 @@
     }
 
 
-    const RWCE_DB_PASSWORD_FIELDS = [
-      'password',
-      'login_password',
-      'user_password',
-      'access_password',
-      'portal_password',
-      'temporary_password',
-      'temp_password',
-      'passcode',
-      'access_code'
-    ];
+    const RWCE_PROFILE_SELECT = 'id, organization_id, full_name, email, role, created_at, updated_at';
 
-    const RWCE_DB_PASSWORD_HASH_FIELDS = [
-      'password_hash',
-      'password_sha256',
-      'password_hash_sha256',
-      'sha256_password'
-    ];
-
-    function profileValue(profile, fields) {
-      if (!profile) return '';
-      for (const field of fields) {
-        if (Object.prototype.hasOwnProperty.call(profile, field) && profile[field] !== null && profile[field] !== undefined) {
-          return String(profile[field]);
-        }
-      }
-      return '';
-    }
-
-    async function sha256Hex(value) {
-      const encoder = new TextEncoder();
-      const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(value));
-      return Array.from(new Uint8Array(buffer))
-        .map(byte => byte.toString(16).padStart(2, '0'))
-        .join('');
-    }
-
-    async function fetchDatabaseLoginProfile(email) {
-      if (!rwceSupabaseReady || !rwceSupabase || !email) return { profile: null, error: 'Supabase is not configured.' };
-
-      try {
-        const { data, error } = await rwceSupabase
-          .from('profiles')
-          .select('*')
-          .ilike('email', email)
-          .maybeSingle();
-
-        if (error) {
-          console.warn('Unable to load database user profile:', error.message);
-          return { profile: null, error: error.message || 'Unable to read the profile table.' };
-        }
-
-        return { profile: data || null, error: null };
-      } catch (error) {
-        console.warn('Unable to load database user profile:', error);
-        return { profile: null, error: 'Unable to connect to the database login table.' };
-      }
+    function normalizePortalRole(role) {
+      const value = String(role || 'learner').trim().toLowerCase();
+      if (value === 'administrator') return 'admin';
+      if (['admin', 'manager', 'learner'].includes(value)) return value;
+      return 'learner';
     }
 
     function profileIsDisabled(profile) {
-      if (!profile) return true;
+      if (!profile) return false;
       const status = String(profile.status || '').trim().toLowerCase();
       const inactiveStatus = status && !['active', 'enabled', 'approved'].includes(status);
       return inactiveStatus || profile.active === false || profile.enabled === false || profile.is_active === false;
     }
 
-    async function validateDatabaseLogin(email, password) {
-      const { profile, error } = await fetchDatabaseLoginProfile(email);
-
-      if (error) {
-        return { ok: false, profile: null, message: 'Database login is not available. Check the Supabase table permissions and connection settings.' };
+    async function fetchDatabaseProfileForAuthUser(user) {
+      if (!rwceSupabaseReady || !rwceSupabase || !user) {
+        return { profile: null, error: 'Supabase is not configured.' };
       }
 
-      if (!profile) {
+      try {
+        let { data, error } = await rwceSupabase
+          .from('profiles')
+          .select(RWCE_PROFILE_SELECT)
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Unable to load profile by auth id:', error.message);
+        }
+
+        if (!data && user.email) {
+          const fallback = await rwceSupabase
+            .from('profiles')
+            .select(RWCE_PROFILE_SELECT)
+            .ilike('email', user.email)
+            .maybeSingle();
+
+          if (fallback.error) {
+            console.warn('Unable to load profile by email:', fallback.error.message);
+            return { profile: null, error: fallback.error.message || 'Unable to read the profiles table.' };
+          }
+
+          data = fallback.data || null;
+        }
+
+        return { profile: data || null, error: null };
+      } catch (error) {
+        console.warn('Unable to load database user profile:', error);
+        return { profile: null, error: 'Unable to connect to the database profile table.' };
+      }
+    }
+
+    function buildProfileFromAuthUser(user) {
+      const metadata = user?.user_metadata || {};
+      return {
+        id: user?.id || '',
+        organization_id: metadata.organization_id || null,
+        full_name: metadata.full_name || metadata.name || (user?.email ? user.email.split('@')[0] : 'User'),
+        email: user?.email || '',
+        role: normalizePortalRole(metadata.role || 'learner')
+      };
+    }
+
+    async function validateDatabaseLogin(email, password) {
+      if (!rwceSupabaseReady || !rwceSupabase) {
+        return { ok: false, profile: null, message: 'Database login is not configured. Please contact the administrator.' };
+      }
+
+      const { data: authData, error: authError } = await rwceSupabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (authError || !authData?.user) {
         return { ok: false, profile: null, message: 'Invalid email or password. Please try again.' };
       }
 
+      const { profile, error: profileError } = await fetchDatabaseProfileForAuthUser(authData.user);
+
+      if (profileError) {
+        await rwceSupabase.auth.signOut();
+        return { ok: false, profile: null, message: 'Login worked, but the profile/role table could not be read. Check Supabase RLS policies for public.profiles.' };
+      }
+
+      if (!profile) {
+        await rwceSupabase.auth.signOut();
+        return { ok: false, profile: null, message: 'Login worked, but no matching public.profiles row was found for this user.' };
+      }
+
       if (profileIsDisabled(profile)) {
+        await rwceSupabase.auth.signOut();
         return { ok: false, profile: null, message: 'This account is not active. Please contact the administrator.' };
       }
 
-      const plainPassword = profileValue(profile, RWCE_DB_PASSWORD_FIELDS);
-      if (plainPassword && plainPassword === password) {
-        return { ok: true, profile, message: '' };
-      }
-
-      const storedHash = profileValue(profile, RWCE_DB_PASSWORD_HASH_FIELDS).toLowerCase();
-      if (storedHash) {
-        const inputHash = await sha256Hex(password);
-        if (storedHash === inputHash) {
-          return { ok: true, profile, message: '' };
-        }
-      }
-
-      if (!plainPassword && !storedHash) {
-        return {
-          ok: false,
-          profile: null,
-          message: 'Your profile was found, but no database password field was available. Add a password or password_hash column to public.profiles.'
-        };
-      }
-
-      return { ok: false, profile: null, message: 'Invalid email or password. Please try again.' };
+      return { ok: true, profile: { ...buildProfileFromAuthUser(authData.user), ...profile, role: normalizePortalRole(profile.role) }, message: '' };
     }
 
     async function activatePortalForProfile(profile) {
@@ -3114,11 +3108,13 @@
       const portalShell = document.getElementById('portalShell');
       const errorBox = document.getElementById('loginError');
       const displayName = profile?.full_name || profile?.name || profile?.email || 'User';
-      const userRole = profile?.role || 'learner';
+      const userRole = normalizePortalRole(profile?.role);
 
       localStorage.setItem('rwce_active_user', displayName);
+      localStorage.setItem('rwce_active_user_id', profile?.id || '');
       localStorage.setItem('rwce_active_user_email', profile?.email || '');
       localStorage.setItem('rwce_active_user_role', userRole);
+      localStorage.setItem('rwce_active_organization_id', profile?.organization_id || '');
       localStorage.setItem('rwce_database_login_active', 'true');
 
       if (errorBox) errorBox.classList.add('hidden');
@@ -3129,14 +3125,18 @@
     }
 
     async function restoreDatabaseLoginSession() {
-      const email = localStorage.getItem('rwce_active_user_email');
-      const isDatabaseLogin = localStorage.getItem('rwce_database_login_active') === 'true';
-      if (!email || !isDatabaseLogin) return false;
+      if (!rwceSupabaseReady || !rwceSupabase) return false;
 
-      const { profile } = await fetchDatabaseLoginProfile(email);
-      if (!profile || profileIsDisabled(profile)) return false;
+      const { data, error } = await rwceSupabase.auth.getSession();
+      if (error || !data?.session?.user) return false;
 
-      await activatePortalForProfile(profile);
+      const { profile } = await fetchDatabaseProfileForAuthUser(data.session.user);
+      if (!profile || profileIsDisabled(profile)) {
+        await rwceSupabase.auth.signOut();
+        return false;
+      }
+
+      await activatePortalForProfile({ ...buildProfileFromAuthUser(data.session.user), ...profile, role: normalizePortalRole(profile.role) });
       return true;
     }
 
